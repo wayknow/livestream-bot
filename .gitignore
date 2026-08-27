@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Conda
+.conda/
+
+# ML model files
+*.bin
+*.safetensors
+*.gguf
+adapters/
+fused_model/
+
+# Training outputs
+*.log
+wandb/
+runs/
+
+# Data (large files)
+data/*.jsonl
+!data/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
