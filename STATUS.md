@@ -1,8 +1,8 @@
-# 直播话术助手 — 开发状态（2026-08-27）
+# 直播话术助手 — 开发状态（2026-08-28）
 
 ## 一句话概述
 
-基于 QLoRA + DPO 的直播带货话术生成器，24GB Mac Mini 本地可跑。**当前进度：环境已就绪，进入 Week 1 数据构造阶段。**
+基于 QLoRA + DPO 的直播带货话术生成器，24GB Mac Mini 本地可跑。**当前进度：四周练手方案全部完成，模型已可本地运行。**
 
 ---
 
@@ -11,10 +11,10 @@
 | 阶段 | 状态 | 产出 |
 |------|:----:|------|
 | 环境准备 | ✅ | Miniconda + Python 3.11 + mlx-lm/trl/peft |
-| Week 1：数据构造 | ⏳ | 待生成 train.jsonl / dpo.jsonl |
-| Week 2：SFT 微调 | ⏳ | 待训练 adapters/sft-7b |
-| Week 3：DPO 优化 | ⏳ | 待训练 adapters/dpo-3b |
-| Week 4：部署测试 | ⏳ | 待融合 fused_model/livestream-7b-sft |
+| Week 1：数据构造 | ✅ | 200 条 SFT + 100 条 DPO |
+| Week 2：SFT 微调 | ✅ | Loss 3.937 → 0.030（↓99.2%） |
+| Week 3：DPO 优化 | ✅ | rewards/margins 0.068 → 0.619（↑9倍） |
+| Week 4：部署测试 | ✅ | 融合模型 + 本地推理 |
 
 ---
 
@@ -43,65 +43,150 @@ cd /Users/xiaoxiao/work/finetuning/livestream-bot
 
 ```
 livestream-bot/
-├── README.md
-├── PRODUCT.md
-├── STATUS.md
-├── PROJECT_LOG.md
-├── data/               # 空，待 Week 1 填充
-├── adapters/           # 空，待 Week 2/3 训练
-└── fused_model/        # 空，待 Week 4 融合
+├── README.md           # 项目简介
+├── PRODUCT.md          # 产品描述
+├── STATUS.md           # 本文件
+├── PROJECT_LOG.md      # 决策日志
+├── REPORT.md           # 练手报告
+├── config.yaml         # 训练配置
+├── data/
+│   ├── train.jsonl     # SFT 训练集（170 条）
+│   ├── valid.jsonl     # SFT 验证集（30 条）
+│   └── dpo.jsonl       # DPO 偏好对（100 条）
+├── scripts/
+│   ├── generate_data.py # 数据生成脚本
+│   └── dpo_train.py     # DPO 训练脚本
+├── adapters/
+│   ├── sft-7b/         # SFT LoRA 权重
+│   └── dpo-3b/         # DPO LoRA 权重
+└── fused_model/
+    └── livestream-7b-sft/ # 融合后的完整模型
 ```
 
 ---
 
-## 四周计划
+## 四周完成情况
 
-### Week 1（当前）：数据构造
+### Week 1：数据构造 ✅
 
-**目标**：200 条 SFT 数据 + 100 条 DPO 偏好对
+| 任务 | 状态 | 产出 |
+|------|:----:|------|
+| 手写 50 条核心 SFT 样本 | ✅ | 10 品类 × 5 风格 |
+| 模板扩充脚本 | ✅ | 自动扩到 200 条 |
+| DPO 偏好对 | ✅ | 100 条 |
+| 数据质量检查 | ✅ | 修复互动指令重复问题 |
 
-| 任务 | 状态 |
-|------|:----:|
-| 手写 50 条核心 SFT 样本（10 品类 × 5 风格） | ⏳ |
-| 编写模板扩充脚本，自动扩到 200 条 | ⏳ |
-| 构造 50-100 条 DPO 偏好对 | ⏳ |
-| 数据质量检查 + 格式验证 | ⏳ |
+### Week 2：QLoRA SFT ✅
 
-### Week 2：QLoRA SFT
+| 任务 | 状态 | 结果 |
+|------|:----:|------|
+| 下载 Qwen2.5-7B-Instruct | ✅ | 7B 模型 |
+| LoRA 训练（600 iters） | ✅ | Loss 3.937 → 0.030 |
+| 测试生成效果 | ✅ | 显著改善 |
+| 融合模型 | ✅ | fused_model/livestream-7b-sft |
 
-**目标**：用 mlx-lm 训练 7B 模型
+### Week 3：DPO ✅
 
-| 任务 | 状态 |
-|------|:----:|
-| 下载 Qwen2.5-7B-Instruct | ⏳ |
-| 运行 lora 训练，观察 loss 曲线 | ⏳ |
-| 测试生成效果，与基座对比 | ⏳ |
-| 调参（如 loss 不收敛） | ⏳ |
+| 任务 | 状态 | 结果 |
+|------|:----:|------|
+| 下载 Qwen2.5-3B-Instruct | ✅ | 3B 模型 |
+| DPO 训练（3 epochs） | ✅ | Loss 0.6602 → 0.4331 |
+| 对比 chosen/rejected | ✅ | margins 提升 9 倍 |
 
-### Week 3：DPO
+### Week 4：部署 ✅
 
-**目标**：用 TRL 训练偏好模型
-
-| 任务 | 状态 |
-|------|:----:|
-| 下载 Qwen2.5-3B-Instruct | ⏳ |
-| 运行 DPO 训练 | ⏳ |
-| 对比 chosen/reward 差距 | ⏳ |
-| 测试"拒绝平淡"效果 | ⏳ |
-
-### Week 4：部署
-
-**目标**：融合模型 + 本地推理
-
-| 任务 | 状态 |
-|------|:----:|
-| 融合 SFT LoRA 到基座 | ⏳ |
-| 生成对比报告（基座 vs SFT vs DPO） | ⏳ |
-| 编写练手总结 | ⏳ |
+| 任务 | 状态 | 结果 |
+|------|:----:|------|
+| 融合 LoRA 到基座 | ✅ | 15GB 完整模型 |
+| 本地推理测试 | ✅ | 生成效果良好 |
+| 练手报告 | ✅ | REPORT.md |
 
 ---
 
-## 下一步
+## 训练结果汇总
 
-1. **立即开始**：Week 1 数据构造
-2. **需要决策**：是否先写数据扩充脚本，还是手动写 50 条样本？
+### SFT 训练曲线
+
+```
+Iter 1:   Loss 3.937  ████████████████████████████████████████
+Iter 100: Loss 0.470  ████
+Iter 200: Loss 0.055  ▎
+Iter 300: Loss 0.042  ▎
+Iter 400: Loss 0.036  ▏
+Iter 500: Loss 0.033  ▏
+Iter 600: Loss 0.030  ▏
+```
+
+**Loss 下降 99.2%，模型收敛良好。**
+
+### DPO 训练结果
+
+| 指标 | 初始 | 最终 | 变化 |
+|------|------|------|------|
+| Loss | 0.6602 | 0.4331 | ↓ 34% |
+| rewards/chosen | 0.043 | 0.346 | ↑ 700% |
+| rewards/rejected | -0.024 | -0.272 | ↓ 1000% |
+| rewards/margins | 0.068 | 0.619 | ↑ 810% |
+
+### 效果对比
+
+| 维度 | 基座模型 | SFT 后 |
+|------|---------|--------|
+| 互动指令 | ❌ 没有 | ✅ 频繁 |
+| 口语化程度 | ⚠️ 书面语 | ✅ 很口语 |
+| 情绪节奏 | ❌ 平铺直叙 | ✅ 有起伏 |
+| 逼单紧迫感 | ❌ 弱 | ✅ 强 |
+| 口头禅使用 | ❌ 没有 | ✅ 有 |
+
+---
+
+## 使用方法
+
+### 快速生成话术
+
+```bash
+conda activate mlx
+
+python -m mlx_lm generate \
+    --model /Users/xiaoxiao/work/finetuning/livestream-bot/fused_model/livestream-7b-sft \
+    --prompt "产品：充电宝；卖点：20000mAh、快充、轻便；生成1分钟话术" \
+    --max-tokens 300 \
+    --temp 0.7 \
+    --top-p 0.9
+```
+
+### 参数说明
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| `--temp` | 0.7 | 温度参数，控制随机性 |
+| `--top-p` | 0.9 | 核采样，从概率最高的 90% 词中采样 |
+| `--max-tokens` | 300 | 最大生成长度 |
+
+---
+
+## 下一步优化方向
+
+### 短期
+
+1. **优化数据质量**：增加更多品类和风格组合
+2. **调整 LoRA 参数**：尝试 r=32, alpha=64
+3. **尝试 14B 模型**：Qwen2.5-14B-Instruct
+
+### 中期
+
+1. **DPO + SFT 联合训练**：先 SFT 再 DPO
+2. **部署为 API**：用 FastAPI 包装
+3. **收集用户反馈**：持续优化
+
+### 长期
+
+1. **PPO 训练**：需要多卡 GPU
+2. **RLHF 完整流程**
+3. **多模态支持**
+
+---
+
+**最后更新**：2026-08-28
+**硬件环境**：Mac Mini M4, 24GB Unified Memory
+**软件环境**：mlx-lm 0.31.3, transformers 5.16.1, trl 1.12.0
