@@ -1,0 +1,23 @@
+# LoRA 训练配置
+model: "Qwen/Qwen2.5-7B-Instruct"
+train: true
+data: "./data"
+
+# LoRA 参数
+fine_tune_type: "lora"
+num_layers: 16        # 只训练最后 16 层
+lora_parameters:
+  rank: 16            # LoRA 秩
+  alpha: 32           # 缩放因子
+  dropout: 0.05       # Dropout 比例
+
+# 训练参数
+batch_size: 2
+iters: 600
+learning_rate: 1e-5
+steps_per_report: 50
+steps_per_eval: 100
+seed: 42
+
+# 保存路径
+adapter_path: "./adapters/sft-7b"
