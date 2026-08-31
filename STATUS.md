@@ -49,7 +49,7 @@ livestream-bot/
 ├── PRODUCT.md              # 产品描述
 ├── STATUS.md               # 本文件
 ├── PROJECT_LOG.md          # 决策日志
-├── REPORT.md               # 练手报告
+├── REPORT.md               # 项目报告
 ├── config.yaml             # 训练配置
 ├── data/
 │   ├── train.jsonl         # SFT 训练集（170 条）
@@ -104,7 +104,7 @@ livestream-bot/
 |------|:----:|------|
 | 融合 LoRA 到基座 | ✅ | 15GB 完整模型 |
 | 本地推理测试 | ✅ | 生成效果良好 |
-| 练手报告 | ✅ | REPORT.md |
+| 项目报告 | ✅ | REPORT.md |
 
 ### 评估体系 ✅
 
