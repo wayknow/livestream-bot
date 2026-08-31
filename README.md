@@ -20,7 +20,7 @@ livestream-bot/
 ├── PRODUCT.md              # 产品描述与数据格式
 ├── STATUS.md               # 开发状态与进度
 ├── PROJECT_LOG.md          # 决策日志
-├── REPORT.md               # 练手报告
+├── REPORT.md               # 项目报告
 ├── config.yaml             # 训练配置
 ├── data/
 │   ├── train.jsonl         # SFT 训练集（170 条）
@@ -93,7 +93,7 @@ python scripts/eval_pipeline.py \
 - [产品描述与数据格式](PRODUCT.md)
 - [开发状态与进度](STATUS.md)
 - [项目决策日志](PROJECT_LOG.md)
-- [练手报告](REPORT.md)
+- [项目报告](REPORT.md)
 
 ## Tech Stack
 
