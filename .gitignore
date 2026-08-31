@@ -26,6 +26,7 @@ runs/
 # Data (large files)
 data/*.jsonl
 !data/.gitkeep
+!data/benchmark_prompts.jsonl  # 允许 benchmark 文件被提交
 
 # IDE
 .vscode/
