@@ -73,6 +73,12 @@ TIME_PATTERNS = [
     r'第\d+', r'前\d+', r'后\d+'
 ]
 
+# 价格相关的数字模式（不计入幻觉，因为模型可能合理推测价格）
+PRICE_PATTERNS = [
+    r'只要\d+', r'只要\d+元', r'卖\d+', r'卖\d+元',
+    r'只要\d+块', r'卖\d+块', r'原价\d+', r'原价\d+元'
+]
+
 
 class LiveStreamEvaluator:
     """直播话术评估器"""
@@ -133,7 +139,7 @@ class LiveStreamEvaluator:
         covered_points = sum(1 for sp in prompt_selling_points if sp in text)
         selling_point_coverage = round(covered_points / max(len(prompt_selling_points), 1), 3)
 
-        # 6. 幻觉率（排除时间相关的数字）
+        # 6. 幻觉率（排除时间相关和价格相关的数字）
         nums_in_output = set(re.findall(r'\d+', text))
         # 从 prompt 提取所有数字
         nums_in_prompt = set(re.findall(r'\d+', prompt))
@@ -145,8 +151,16 @@ class LiveStreamEvaluator:
                 num = re.findall(r'\d+', match)
                 if num:
                     time_related_nums.update(num)
-        # 检查不在 prompt 中且不是常见数字且不是时间相关数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums
+        # 排除价格相关的数字（如"只要79"、"卖49"等）
+        price_related_nums = set()
+        for pattern in PRICE_PATTERNS:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                num = re.findall(r'\d+', match)
+                if num:
+                    price_related_nums.update(num)
+        # 检查不在 prompt 中且不是常见数字且不是时间/价格相关数字的
+        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums - price_related_nums
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）
@@ -483,11 +497,23 @@ class LiveStreamEvaluator:
 
 def create_mlx_generator(model_path: str, adapter_path: str = None, temp: float = 0.7):
     """创建 MLX 生成函数"""
+    # System prompt（与训练数据一致）
+    SYSTEM_PROMPT = """你是一位抖音直播带货话术专家。你的风格特征：
+①短句为主，每句不超过15字
+②每3句话插入一次互动指令（"扣1"、"对不对"、"听我说"）
+③先讲痛点场景，再给解决方案，最后价格逼单
+④情绪递进：平静→兴奋→急促
+⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有
+⑥数字要具体：价格、数量、时间都要明确说出"""
+
     def generate(prompt: str) -> str:
+        # 构造完整的 prompt（包含 system prompt）
+        full_prompt = f"{SYSTEM_PROMPT}\n\n用户：{prompt}\n助手："
+
         cmd = [
             sys.executable, "-m", "mlx_lm", "generate",
             "--model", model_path,
-            "--prompt", prompt,
+            "--prompt", full_prompt,
             "--max-tokens", "300",
             "--temp", str(temp)
         ]

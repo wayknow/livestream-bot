@@ -219,15 +219,18 @@ def generate_sft_sample(category, style, duration="1分钟"):
     # 生成目标人群
     target = random.choice(TARGETS)
 
-    # 根据风格生成话术（短句版本，每句不超过 15 字）
+    # 根据风格生成话术（短句版本，每句不超过 15 字，硬编码互动词和口语词）
     if style["name"] == "激情逼单型":
         script = (
+            f"来！{target}给我扣1！"
             f"有没有{pain}的？"
+            f"对不对？"
             f"{scene}最怕这个了！"
             f"听我说！"
             f"今天这个{category['name']}绝了！"
             f"{solution}！"
             f"真的绝绝子！"
+            f"我跟你说！"
             f"平时{original_price}！"
             f"今天只要{price}！"
             f"{gift}！"
@@ -241,8 +244,9 @@ def generate_sft_sample(category, style, duration="1分钟"):
         script = (
             f"姐妹们！"
             f"有没有{pain}？"
+            f"是不是特别烦？"
             f"我懂！"
-            f"{scene}特别烦！"
+            f"{scene}的时候真的崩溃！"
             f"直到遇到这个{category['name']}！"
             f"真的好用到哭！"
             f"{solution}！"
@@ -258,6 +262,7 @@ def generate_sft_sample(category, style, duration="1分钟"):
         script = (
             f"划重点！"
             f"为什么{pain}？"
+            f"知道吗？"
             f"{scene}没用对产品！"
             f"今天这个{category['name']}！"
             f"{solution}！"
@@ -275,6 +280,7 @@ def generate_sft_sample(category, style, duration="1分钟"):
             f"我跟你说！"
             f"我之前{pain}！"
             f"真的崩溃！"
+            f"有没有同感的？"
             f"{scene}太烦了！"
             f"直到遇到这个{category['name']}！"
             f"{solution}！"
@@ -291,6 +297,7 @@ def generate_sft_sample(category, style, duration="1分钟"):
         script = (
             f"你们用过{category['name']}吗？"
             f"{pain}对不对？"
+            f"是不是？"
             f"今天这个不一样！"
             f"{solution}！"
             f"吊打市面产品！"
