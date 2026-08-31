@@ -207,7 +207,7 @@ def generate_urgency(number=None):
 
 
 def generate_sft_sample(category, style, duration="1分钟"):
-    """生成一条 SFT 样本"""
+    """生成一条 SFT 样本（优化版：短句、高互动、口语化）"""
     # 随机选择痛点和解决方案
     pain = random.choice(category["pain_points"])
     solution = random.choice(category["solutions"])
@@ -219,31 +219,100 @@ def generate_sft_sample(category, style, duration="1分钟"):
     # 生成目标人群
     target = random.choice(TARGETS)
 
-    # 根据风格生成话术（注意：不要在话术中硬编码"扣1"，让互动指令统一管理）
+    # 根据风格生成话术（短句版本，每句不超过 15 字）
     if style["name"] == "激情逼单型":
-        script = f"让我看看有多少人{pain}的？{scene}的时候最怕这个了！我跟你说，今天这个{category['name']}真的绝了——{solution}！平时专柜{original_price}，今天直播间，家人们，前50单直接{price}！{gift}！最后一波库存了！来，3、2、1——上链接！"
+        script = (
+            f"有没有{pain}的？"
+            f"{scene}最怕这个了！"
+            f"听我说！"
+            f"今天这个{category['name']}绝了！"
+            f"{solution}！"
+            f"真的绝绝子！"
+            f"平时{original_price}！"
+            f"今天只要{price}！"
+            f"{gift}！"
+            f"最后一波！"
+            f"库存不多了！"
+            f"3、2、1！"
+            f"上链接！"
+        )
 
     elif style["name"] == "温柔种草型":
-        script = f"你们有没有{pain}的烦恼？我之前也是，{scene}的时候特别明显。后来我发现了这个{category['name']}，真的好用到哭。{solution}，用完你会回来谢我。现在{price}，比专柜便宜一半还多，{gift}。你们一定要试试，不试真的后悔。"
+        script = (
+            f"姐妹们！"
+            f"有没有{pain}？"
+            f"我懂！"
+            f"{scene}特别烦！"
+            f"直到遇到这个{category['name']}！"
+            f"真的好用到哭！"
+            f"{solution}！"
+            f"用完你会谢我！"
+            f"现在只要{price}！"
+            f"比专柜便宜一半！"
+            f"{gift}！"
+            f"一定要试试！"
+            f"不试后悔！"
+        )
 
     elif style["name"] == "专业科普型":
-        script = f"我给大家科普一下，为什么你{pain}？关键在于{scene}的时候没有用对产品。今天这个{category['name']}，{solution}，能有效解决这个问题。所以如果你想要好效果，现在{price}就能拿下，{gift}。划重点，这个真的值得囤。"
+        script = (
+            f"划重点！"
+            f"为什么{pain}？"
+            f"{scene}没用对产品！"
+            f"今天这个{category['name']}！"
+            f"{solution}！"
+            f"能有效解决！"
+            f"知识点来了！"
+            f"现在只要{price}！"
+            f"{gift}！"
+            f"记住了！"
+            f"这个值得囤！"
+            f"听懂的扣1！"
+        )
 
     elif style["name"] == "故事型":
-        script = f"我跟你们说，我之前{pain}，真的崩溃。每次{scene}都特别烦。直到我遇到了这个{category['name']}，{solution}，用了一周我就惊了。现在我自己都囤了3个。今天{price}，{gift}。你们一定要试试，我自己就是活广告，不骗你们。"
+        script = (
+            f"我跟你说！"
+            f"我之前{pain}！"
+            f"真的崩溃！"
+            f"{scene}太烦了！"
+            f"直到遇到这个{category['name']}！"
+            f"{solution}！"
+            f"用了一周就惊了！"
+            f"我自己囤了3个！"
+            f"今天只要{price}！"
+            f"{gift}！"
+            f"一定要试试！"
+            f"不骗你们！"
+            f"亲测有效！"
+        )
 
     elif style["name"] == "对比型":
-        script = f"你们用过其他{category['name']}吗？{pain}对不对？今天这个完全不一样，{solution}，吊打市面上大部分产品。别人卖{original_price}，我们只要{price}，{gift}。这个性价比，不买真的亏。"
+        script = (
+            f"你们用过{category['name']}吗？"
+            f"{pain}对不对？"
+            f"今天这个不一样！"
+            f"{solution}！"
+            f"吊打市面产品！"
+            f"别人卖{original_price}！"
+            f"我们只要{price}！"
+            f"{gift}！"
+            f"性价比之王！"
+            f"不买亏了！"
+            f"有同感的扣1！"
+            f"对比一下！"
+            f"真的不一样！"
+        )
 
-    # 插入互动指令（每4-5句插入一次，避免过度重复）
-    sentences = script.split("。")
+    # 确保有互动指令（每 2-3 句插入一次）
+    sentences = [s for s in script.split("！") if s.strip()]
     final_sentences = []
+
     for i, sent in enumerate(sentences):
-        if sent.strip():
-            final_sentences.append(sent.strip())
-            # 每4句插入一次互动，且不要在最后插入
-            if i > 0 and i % 4 == 0 and i < len(sentences) - 1:
-                final_sentences.append(generate_interaction(style, target))
+        final_sentences.append(sent.strip())
+        # 每 2-3 句插入互动，且不要在最后 2 句插入
+        if i > 0 and (i + 1) % 3 == 0 and i < len(sentences) - 2:
+            final_sentences.append(generate_interaction(style, target))
 
     script = "！".join(final_sentences) + "！"
 
