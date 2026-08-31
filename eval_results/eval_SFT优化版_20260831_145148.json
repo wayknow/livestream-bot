@@ -1,0 +1,184 @@
+{
+  "model_name": "SFT优化版",
+  "timestamp": "2026-08-31T14:51:48.218503",
+  "benchmark_size": 5,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "产品：口红；卖点：显白、不拔干；时长：1分钟\n\n【产品展示】（3秒）\n镜头一扫，绝美口红闪耀登场！色彩饱和度MAX！\n\n【卖点聚焦】（15秒）\n产品特写：显白！是不是肌肤瞬间提亮？这个口红的特别之处在于它的显白技术！无论是黄皮、白皮还是偏黄的肤色，上妆后都能呈现自然健康的好气色！\n不拔干！是不是嘴唇干得能刮皮？这个口红的另一大卖点就是它的滋润配方！它能有效防止嘴唇干裂，让妆容更加持久！真的好用到哭！来！做个小实验！（特写镜头展示口红的滋润效果）\n\n【产品应用场景】（7秒）\n无论是日常通勤还是约会派对，这个口红都能应对自如！真的好用到哭！\n\n【结束语】（10秒）\n心动不如行动！现在就来试试这个显白不拔干的口红吧！美丽从口红开始！有没有被种草？来！让我们一起疯狂扣1！！（互动指令）",
+      "metrics": {
+        "interactive_density": 0.143,
+        "avg_sentence_len": 12.2,
+        "spoken_ratio": 0.0146,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.2,
+        "emotion_progression": 3.9,
+        "catchphrase_repeat": 0.071,
+        "sentence_count": 28,
+        "char_count": 343,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 3/28"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "【画外音】干渴的肌肤最怕这个了！姐妹们！有没有毛孔粗大？约会前特别烦！直到遇到这个面膜！急救补水！真的绝绝子！来！所有干皮姐妹给我扣1！！玻尿酸！能有效解决！听我说！同款的干皮姐妹扣个1！！现在只要49！急救补水！真的绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝绝",
+      "metrics": {
+        "interactive_density": 0.375,
+        "avg_sentence_len": 20.6,
+        "spoken_ratio": 0.0182,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "emotion_progression": 3.3,
+        "catchphrase_repeat": 0.062,
+        "sentence_count": 16,
+        "char_count": 329,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 1/16"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "【产品介绍】防晒霜\n\n【时长】2分钟\n\n【产品卖点】\n1. **SPF50+**：有效阻挡紫外线，提供最高级别防护。\n2. **3秒成膜**：快速成膜技术，让涂抹更加便捷。\n3. **不油腻**：清爽配方，适合油皮女生使用。\n\n【目标人群】油皮女生\n\n【场景应用】\n夏日海滩度假、日常通勤、户外运动\n\n【互动环节】\nQ：油皮女生最怕的就是防晒霜太油腻了对不对？\nA：对！油皮女生最怕的就是这个。我们的防晒霜特别针对油皮设计，不油腻！真的好用到哭！来！油皮姐妹给我刷个赞！！我再送你们3个赞！有同感的油皮姐妹给我刷个赞！！\n\n【情感共鸣】\n油皮姐妹的姐妹们，是不是最怕的就这个了？来！油皮姐妹给我刷个赞！！我再送你们3个赞！有同感的油皮姐妹给我刷个赞！！真的绝绝子！油皮姐妹给我刷个赞！！我再送你们3个赞！！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_density": 0.129,
+        "avg_sentence_len": 11.9,
+        "spoken_ratio": 0.019,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.2,
+        "catchphrase_repeat": 0.032,
+        "sentence_count": 31,
+        "char_count": 369,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 4/31"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "【产品聚焦】抗皱面霜探秘——玻色因与7天淡纹的科学之旅\n\n【画外音】当岁月在脸上留下痕迹，抗皱面霜成为了许多人的护肤之选。今天，让我们一起深入探讨一个品牌的秘密武器：抗皱面霜。它凭什么能在众多产品中脱颖而出？答案就藏在两个关键词里：玻色因、7天淡纹。\n\n【镜头切换】实验室场景\n\n【旁白】在护肤科技的最前线，玻色因（Hyaluronic Acid）是明星成分之一。它为何能成为抗皱面霜的秘密武器？答案在于其卓越的保湿性能。玻色因能有效锁住肌肤水分，减少因缺水导致的细纹产生。但抗皱面霜的创新之处并不止于此。它通过独特的配方技术，将玻色因与7天淡纹的目标结合在一起。\n\n【镜头切换】产品特写\n\n【旁白】7天淡纹的秘密在于产品的瞬时紧致和长效修复。在使用抗皱面霜的7天内，用户会明显感受到肌肤紧致度的提升。这一效果的实现依赖于高效能的活性成分和皮肤吸收技术。抗皱面霜通过精准配比，确保每一滴产品都能有效渗透至肌肤深层，促进胶原蛋白生成，从而达到淡化皱纹的效果。\n\n【镜头切换】消费者使用场景\n\n【旁白】科学研究",
+      "metrics": {
+        "interactive_density": 0.0,
+        "avg_sentence_len": 23.8,
+        "spoken_ratio": 0.0022,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 19,
+        "char_count": 453,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 10/19"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "产品：粉底液\n卖点：持妆12小时、不卡粉\n时长：1分钟\n\n（开场）有没有底妆卡粉烦恼？来！听我说！今天这个粉底液绝了！（兴奋递产品）持妆12小时！真的有效！所有姐妹疯狂扣1！！（15秒）\n\n（转折）但是！有没有遇到过干皮姐妹的痛点？来！给我刷个赞！！这个粉底液绝绝子！不卡粉！所有干皮姐妹扣1！！（15秒）\n\n（对比）有没有用过同类型的产品？有没有遇到过妆花掉？我懂！所以！我对比了这个产品和其他品牌！真的不一样！这个好用到哭！（15秒）\n\n（结尾）有没有化妆？有没有底妆烦恼？评论区扣1！！这个粉底液绝绝子！所有姐妹扣1！！有同感的给我刷个赞！！（15秒）",
+      "metrics": {
+        "interactive_density": 0.118,
+        "avg_sentence_len": 8.2,
+        "spoken_ratio": 0.0287,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.059,
+        "sentence_count": 34,
+        "char_count": 279,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/34"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.153,
+      "std": 0.122,
+      "min": 0.0,
+      "max": 0.375
+    },
+    "avg_sentence_len": {
+      "mean": 15.34,
+      "std": 5.864,
+      "min": 8.2,
+      "max": 23.8
+    },
+    "spoken_ratio": {
+      "mean": 0.017,
+      "std": 0.009,
+      "min": 0.002,
+      "max": 0.029
+    },
+    "structure_completeness": {
+      "mean": 3.8,
+      "std": 0.748,
+      "min": 3.0,
+      "max": 5.0
+    },
+    "selling_point_coverage": {
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.207,
+      "std": 0.194,
+      "min": 0.0,
+      "max": 0.5
+    },
+    "emotion_progression": {
+      "mean": 3.84,
+      "std": 0.641,
+      "min": 3.2,
+      "max": 5.0
+    },
+    "catchphrase_repeat": {
+      "mean": 0.045,
+      "std": 0.026,
+      "min": 0.0,
+      "max": 0.071
+    },
+    "sentence_count": {
+      "mean": 25.6,
+      "std": 6.946,
+      "min": 16.0,
+      "max": 34.0
+    },
+    "char_count": {
+      "mean": 354.6,
+      "std": 57.263,
+      "min": 279.0,
+      "max": 453.0
+    },
+    "fluency_score": {
+      "mean": 4.0,
+      "std": 0.632,
+      "min": 3.0,
+      "max": 5.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 3/28",
+      "unique_count": 5
+    }
+  }
+}

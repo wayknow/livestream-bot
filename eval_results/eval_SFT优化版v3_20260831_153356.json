@@ -1,0 +1,184 @@
+{
+  "model_name": "SFT优化版v3",
+  "timestamp": "2026-08-31T15:33:56.729236",
+  "benchmark_size": 5,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "好的，现在我来为你准备一段1分钟的口红产品介绍：\n\n\"女士们，今天要推荐的这款口红绝对能让你的妆容锦上添花！它最大的卖点就是显白！无论是冷白皮还是暖白皮，都能瞬间提亮肤色，让你的气色好到发光！而且，我敢保证，你用完之后会惊呼：真的不拔干！即使上妆时间长了，口红依然服帖不脱色。是不是很值得入手？现在只要99元！送同色号唇膏笔！来，给爱美的自己刷个赞！\"",
+      "metrics": {
+        "interactive_density": 0.182,
+        "avg_sentence_len": 16.0,
+        "spoken_ratio": 0.0114,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "emotion_progression": 2.5,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 11,
+        "char_count": 176,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 4/11"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "【旁白】：当干燥把最后一丝活力夺走时，你的肌肤在说“救救我！”今天，这个面膜要来对你说：“我来了！”急救补水，玻尿酸的承诺，让你的肌肤瞬间焕新。\n\n【画外音】：（产品特写）“急救补水面膜，玻尿酸的保障！当干燥来袭，我为你准备！”（倒计时）3、2、1！急救补水面膜，玻尿酸的承诺，值得你在忙碌中停留30秒。\n\n【产品展示】：（特写镜头）面膜轻轻敷上，肌肤立刻展现出满足的光泽。\n\n【旁白】：玻尿酸，锁住水分的关键！急救补水，从这个面膜开始！（紧迫感）最后10单！买二送一！一定要试试！\n\n【倒计时】：10、9、8、7、6、5、4、3、2、1！库存清零！这个面膜值得收藏！",
+      "metrics": {
+        "interactive_density": 0.062,
+        "avg_sentence_len": 17.8,
+        "spoken_ratio": 0.0035,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 16,
+        "char_count": 284,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 6/16"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "产品：防晒霜  \n卖点：  \n1. SPF50+: 提供高效防晒保护，有效抵御紫外线伤害。  \n2. 3秒成膜：快速成膜，有效防止汗水和摩擦影响防晒效果。  \n3. 不油腻：清爽质地，适合油皮女生使用，不会增加肌肤负担。  \n\n时长：2分钟  \n目标人群：油皮女生  \n\n脚本：\n开头：（10秒）  \n场景：阳光明媚的沙滩  \n旁白：油皮姐妹的夏天在哪里？直到遇到这个防晒霜！  \n（特写防晒霜）  \n旁白：SPF50+！3秒成膜！不油腻！  \n（切换场景：油皮女生）  \n旁白：专为油皮女生设计！有效解决夏天的肌肤烦恼！  \n\n产品展示：（30秒）  \n场景：日常使用场景  \n旁白：SPF50+：高效防晒  \n（特写产品）  \n旁白：3秒成膜：快速成膜  \n（特写油皮女生使用）  \n旁白：不油腻：清爽质地  \n（切换场景：对比油皮和干皮）  \n旁白：油皮姐妹的夏日福音！来！试试这个防晒霜！",
+      "metrics": {
+        "interactive_density": 0.033,
+        "avg_sentence_len": 13.3,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 30,
+        "char_count": 398,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 3/30"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "【产品名称】紧致焕颜抗皱面霜\n\n【卖点】玻色因淡纹科技，7天可见\n\n【时长】1分钟\n\n【视频脚本】\n\n（画面：实验室背景；研究者专注操作）\n\n旁白：您是否在寻找那能有效抗击时间痕迹的面霜？今天要向您推荐的，是一款集科研成果之大成的抗皱面霜。它不仅有玻色因这一全球抗皱金标准成分，更独创7天淡纹科技，让美丽触手可及。\n\n（切换至产品特写、结构图）\n\n研究者：玻色因，又名Pepha-derm，是目前国际公认的黄金抗皱成分。它能有效刺激胶原蛋白生成，达到紧致肌肤、淡化皱纹的目的。\n\n（切换至使用场景：年轻女性）\n\n旁白：我们都知道，抗皱是一个长期的过程。而这款面霜的7天淡纹科技，正是为了缩短这个周期而生。通过独特的配方设计，在短时间内就能看到明显的改善效果。\n\n（切换至实验室结果对比）\n\n研究者：经过严格的临床试验验证，使用本产品7天后，肌肤的纹路明显减淡。这不仅证实了产品的有效性，也让我们对未来的研发充满信心。\n\n（切换至产品外观、包装）\n\n旁白：现在，这款抗皱面霜已经面市。采用精美的瓶身设计，不仅方便",
+      "metrics": {
+        "interactive_density": 0.048,
+        "avg_sentence_len": 21.7,
+        "spoken_ratio": 0.0044,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 4.4,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 21,
+        "char_count": 455,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 9/21"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "当然！在1分钟内，我们可以通过以下方式来介绍这款粉底液及其卖点：\n\n---\n\n主播：姐妹们！今天我要跟你们分享一个真的好用到哭的粉底液！有没有底妆卡粉脱妆的？对不对？我懂！军训的时候真的崩溃！直到遇到这个产品！真的好用到哭！我来简单说说它的卖点！首先，持妆12小时！有没有同感？我之前用过的都惨不忍睹！这个真的好用到哭！第二个卖点，不卡粉！有同感的刷个爱心给我？有没有？真的绝绝子！我来具体讲一下用法：取适量（大概1元硬币大小），均匀涂抹于脸部；轻拍帮助吸收；最后用美妆蛋按压定妆。有没有试用？刷个1！真的好用到哭！对比一下其他品牌！同价位的都卡粉得要死！这个真的绝绝子！有同感的刷个1！！有没有？所有来刷个爱心的姐妹，粉底液用完就对不对口！对不对？所以一定要试试这个！有同感的刷个1！对比一下真的不一样！来！同款的刷个爱心！！有没有？一定要试试！不骗你们！真的好用到哭！有同感的刷个1！！来！所有姐妹给我刷个1！！对比一下真的",
+      "metrics": {
+        "interactive_density": 0.091,
+        "avg_sentence_len": 9.4,
+        "spoken_ratio": 0.0459,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.114,
+        "sentence_count": 44,
+        "char_count": 414,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 4/44"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.083,
+      "std": 0.053,
+      "min": 0.033,
+      "max": 0.182
+    },
+    "avg_sentence_len": {
+      "mean": 15.64,
+      "std": 4.146,
+      "min": 9.4,
+      "max": 21.7
+    },
+    "spoken_ratio": {
+      "mean": 0.013,
+      "std": 0.017,
+      "min": 0.0,
+      "max": 0.046
+    },
+    "structure_completeness": {
+      "mean": 4.0,
+      "std": 0.632,
+      "min": 3.0,
+      "max": 5.0
+    },
+    "selling_point_coverage": {
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.1,
+      "std": 0.2,
+      "min": 0.0,
+      "max": 0.5
+    },
+    "emotion_progression": {
+      "mean": 3.38,
+      "std": 0.703,
+      "min": 2.5,
+      "max": 4.4
+    },
+    "catchphrase_repeat": {
+      "mean": 0.023,
+      "std": 0.046,
+      "min": 0.0,
+      "max": 0.114
+    },
+    "sentence_count": {
+      "mean": 24.4,
+      "std": 11.638,
+      "min": 11.0,
+      "max": 44.0
+    },
+    "char_count": {
+      "mean": 345.4,
+      "std": 101.933,
+      "min": 176.0,
+      "max": 455.0
+    },
+    "fluency_score": {
+      "mean": 3.6,
+      "std": 0.49,
+      "min": 3.0,
+      "max": 4.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 4/11",
+      "unique_count": 5
+    }
+  }
+}

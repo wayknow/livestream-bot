@@ -1,0 +1,184 @@
+{
+  "model_name": "SFT优化版v4",
+  "timestamp": "2026-08-31T15:39:11.317010",
+  "benchmark_size": 5,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "姐妹们！有没有化妆卡粉的？对不对？熬夜加班最怕这个了！有没有口红掉色的？对不对？出差旅行最怕这个了！来！口红控的给我刷个赞！！直到遇到这个！真的好用到哭！显白不拔干！所有口红女孩儿，给我刷个爱心！！用了一周就惊了！我自己囤了3个！今天只要79！比专柜便宜一半！来！口红女孩儿给我刷个赞！！送同款小样！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_density": 0.174,
+        "avg_sentence_len": 7.2,
+        "spoken_ratio": 0.0422,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "emotion_progression": 4.3,
+        "catchphrase_repeat": 0.043,
+        "sentence_count": 23,
+        "char_count": 166,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "姐妹们！对不对脸色暗沉？是不是特别烦？我懂！约会前的时候真的崩溃！有没有同感的？熬夜党在哪里？给我扣个1！！直到遇到这个面膜！真的好用到哭！急救补水！玻尿酸！姐妹们！扣1！！用完你会谢我！现在只要49！比专柜便宜一半！来！所有熬夜党，给我刷个赞！！买2送1！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_density": 0.318,
+        "avg_sentence_len": 6.4,
+        "spoken_ratio": 0.0214,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "emotion_progression": 3.3,
+        "catchphrase_repeat": 0.045,
+        "sentence_count": 22,
+        "char_count": 140,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/22"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "你们用过防晒霜吗？晒黑两个度对不对？是不是？今天这个不一样！SPF50+！油皮姐妹在哪里？给我给我刷个赞！！3秒成膜！真的绝了！来！油皮姐妹给我刷个爱心！！不油腻！吊打市面产品！有同感的扣1！现在只要79！送同款小样！来！油皮姐妹给我刷个赞！！性价比之王！不买亏了！有同感的扣1！库存不多了！3、2、1！上链接！",
+      "metrics": {
+        "interactive_density": 0.167,
+        "avg_sentence_len": 6.5,
+        "spoken_ratio": 0.0385,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.2,
+        "emotion_progression": 3.3,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 156,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "你们用过抗皱面霜吗？法令纹深得能存水对不对？是不是？今天这个不一样！玻色因的！7天淡纹！吊打市面产品！有同感的扣1！同款的姐妹扣个666！！别人卖399！我们只要168！送精华小样！来！疯狂扣1！！性价比之王！不买亏了！有同感的扣1！所有黑心肠的，给我刷个赞！！对比一下！真的不一样！",
+      "metrics": {
+        "interactive_density": 0.2,
+        "avg_sentence_len": 7.1,
+        "spoken_ratio": 0.0141,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.6,
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 20,
+        "char_count": 142,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/20"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "姐妹们！有没有妆花掉的？是不是特别烦？我懂！通勤约会的时候真的崩溃！有没有同感？举个手势让我看看！！直到遇到这个粉底液！真的好用到哭！持妆12小时！不卡粉！所有姐妹刷个爱心！！用完你会谢我！现在只要79！比专柜便宜一半！所有黑心商家，给我刷个赞！！送同款小样！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_density": 0.211,
+        "avg_sentence_len": 7.4,
+        "spoken_ratio": 0.0213,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "emotion_progression": 3.3,
+        "catchphrase_repeat": 0.053,
+        "sentence_count": 19,
+        "char_count": 141,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/19"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.214,
+      "std": 0.054,
+      "min": 0.167,
+      "max": 0.318
+    },
+    "avg_sentence_len": {
+      "mean": 6.92,
+      "std": 0.397,
+      "min": 6.4,
+      "max": 7.4
+    },
+    "spoken_ratio": {
+      "mean": 0.028,
+      "std": 0.011,
+      "min": 0.014,
+      "max": 0.042
+    },
+    "structure_completeness": {
+      "mean": 4.4,
+      "std": 0.49,
+      "min": 4.0,
+      "max": 5.0
+    },
+    "selling_point_coverage": {
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.427,
+      "std": 0.142,
+      "min": 0.2,
+      "max": 0.6
+    },
+    "emotion_progression": {
+      "mean": 3.6,
+      "std": 0.4,
+      "min": 3.3,
+      "max": 4.3
+    },
+    "catchphrase_repeat": {
+      "mean": 0.037,
+      "std": 0.019,
+      "min": 0.0,
+      "max": 0.053
+    },
+    "sentence_count": {
+      "mean": 21.6,
+      "std": 1.855,
+      "min": 19.0,
+      "max": 24.0
+    },
+    "char_count": {
+      "mean": 149.0,
+      "std": 10.315,
+      "min": 140.0,
+      "max": 166.0
+    },
+    "fluency_score": {
+      "mean": 5.0,
+      "std": 0.0,
+      "min": 5.0,
+      "max": 5.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 0/23",
+      "unique_count": 5
+    }
+  }
+}
