@@ -79,6 +79,9 @@ PRICE_PATTERNS = [
     r'只要\d+块', r'卖\d+块', r'原价\d+', r'原价\d+元'
 ]
 
+# 互动词中的数字（不计入幻觉）
+INTERACTIVE_NUMBERS = {'666', '888', '520', '1314'}
+
 
 class LiveStreamEvaluator:
     """直播话术评估器"""
@@ -159,8 +162,8 @@ class LiveStreamEvaluator:
                 num = re.findall(r'\d+', match)
                 if num:
                     price_related_nums.update(num)
-        # 检查不在 prompt 中且不是常见数字且不是时间/价格相关数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums - price_related_nums
+        # 检查不在 prompt 中且不是常见数字且不是时间/价格/互动词相关数字的
+        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）

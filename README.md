@@ -54,9 +54,14 @@ cd /Users/xiaoxiao/work/finetuning/livestream-bot
 ### 2. 生成话术
 
 ```bash
+# 完整 prompt（包含 system prompt）
 python -m mlx_lm generate \
     --model /Users/xiaoxiao/work/finetuning/livestream-bot/fused_model/livestream-7b-sft \
-    --prompt "产品：充电宝；卖点：20000mAh、快充、轻便；生成1分钟话术" \
+    --prompt '你是一位抖音直播带货话术专家。你的风格特征：①短句为主，每句不超过15字；②每3句话插入一次互动指令；③先讲痛点场景，再给解决方案，最后价格逼单；④情绪递进：平静→兴奋→急促；⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有。
+
+用户：产品：充电宝；卖点：20000mAh、快充、轻便；时长：1分钟
+
+助手：' \
     --max-tokens 300 \
     --temp 0.7 \
     --top-p 0.9

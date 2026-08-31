@@ -220,105 +220,106 @@ def generate_sft_sample(category, style, duration="1分钟"):
     target = random.choice(TARGETS)
 
     # 根据风格生成话术（短句版本，每句不超过 15 字，硬编码互动词和口语词）
+    # 每个风格都包含：互动词、口语词、情绪递进
     if style["name"] == "激情逼单型":
         script = (
-            f"来！{target}给我扣1！"
-            f"有没有{pain}的？"
-            f"对不对？"
-            f"{scene}最怕这个了！"
-            f"听我说！"
-            f"今天这个{category['name']}绝了！"
-            f"{solution}！"
-            f"真的绝绝子！"
-            f"我跟你说！"
-            f"平时{original_price}！"
-            f"今天只要{price}！"
-            f"{gift}！"
-            f"最后一波！"
-            f"库存不多了！"
-            f"3、2、1！"
-            f"上链接！"
+            f"来！{target}给我扣1！"  # 互动
+            f"有没有{pain}的？"  # 互动
+            f"对不对？"  # 互动
+            f"{scene}最怕这个了！"  # 痛点
+            f"听我说！"  # 互动
+            f"今天这个{category['name']}绝了！"  # 兴奋
+            f"{solution}！"  # 卖点
+            f"真的绝绝子！"  # 口语
+            f"我跟你说！"  # 口语
+            f"平时{original_price}！"  # 价格锚定
+            f"今天只要{price}！"  # 逼单
+            f"{gift}！"  # 福利
+            f"最后一波！"  # 急促
+            f"库存不多了！"  # 急促
+            f"3、2、1！"  # 急促
+            f"上链接！"  # 行动
         )
 
     elif style["name"] == "温柔种草型":
         script = (
-            f"姐妹们！"
-            f"有没有{pain}？"
-            f"是不是特别烦？"
-            f"我懂！"
-            f"{scene}的时候真的崩溃！"
-            f"直到遇到这个{category['name']}！"
-            f"真的好用到哭！"
-            f"{solution}！"
-            f"用完你会谢我！"
-            f"现在只要{price}！"
-            f"比专柜便宜一半！"
-            f"{gift}！"
-            f"一定要试试！"
-            f"不试后悔！"
+            f"姐妹们！"  # 互动
+            f"有没有{pain}？"  # 互动
+            f"是不是特别烦？"  # 互动
+            f"我懂！"  # 口语
+            f"{scene}的时候真的崩溃！"  # 痛点
+            f"直到遇到这个{category['name']}！"  # 转折
+            f"真的好用到哭！"  # 口语
+            f"{solution}！"  # 卖点
+            f"用完你会谢我！"  # 口语
+            f"现在只要{price}！"  # 逼单
+            f"比专柜便宜一半！"  # 价格锚定
+            f"{gift}！"  # 福利
+            f"一定要试试！"  # 行动
+            f"不试后悔！"  # 口语
         )
 
     elif style["name"] == "专业科普型":
         script = (
-            f"划重点！"
-            f"为什么{pain}？"
-            f"知道吗？"
-            f"{scene}没用对产品！"
-            f"今天这个{category['name']}！"
-            f"{solution}！"
-            f"能有效解决！"
-            f"知识点来了！"
-            f"现在只要{price}！"
-            f"{gift}！"
-            f"记住了！"
-            f"这个值得囤！"
-            f"听懂的扣1！"
+            f"划重点！"  # 互动
+            f"为什么{pain}？"  # 互动
+            f"知道吗？"  # 互动
+            f"{scene}没用对产品！"  # 痛点
+            f"今天这个{category['name']}！"  # 产品
+            f"{solution}！"  # 卖点
+            f"能有效解决！"  # 效果
+            f"知识点来了！"  # 口语
+            f"现在只要{price}！"  # 逼单
+            f"{gift}！"  # 福利
+            f"记住了！"  # 口语
+            f"这个值得囤！"  # 口语
+            f"听懂的扣1！"  # 互动
         )
 
     elif style["name"] == "故事型":
         script = (
-            f"我跟你说！"
-            f"我之前{pain}！"
-            f"真的崩溃！"
-            f"有没有同感的？"
-            f"{scene}太烦了！"
-            f"直到遇到这个{category['name']}！"
-            f"{solution}！"
-            f"用了一周就惊了！"
-            f"我自己囤了3个！"
-            f"今天只要{price}！"
-            f"{gift}！"
-            f"一定要试试！"
-            f"不骗你们！"
-            f"亲测有效！"
+            f"我跟你说！"  # 口语
+            f"我之前{pain}！"  # 痛点
+            f"真的崩溃！"  # 口语
+            f"有没有同感的？"  # 互动
+            f"{scene}太烦了！"  # 痛点
+            f"直到遇到这个{category['name']}！"  # 转折
+            f"{solution}！"  # 卖点
+            f"用了一周就惊了！"  # 口语
+            f"我自己囤了3个！"  # 口语
+            f"今天只要{price}！"  # 逼单
+            f"{gift}！"  # 福利
+            f"一定要试试！"  # 行动
+            f"不骗你们！"  # 口语
+            f"亲测有效！"  # 口语
         )
 
     elif style["name"] == "对比型":
         script = (
-            f"你们用过{category['name']}吗？"
-            f"{pain}对不对？"
-            f"是不是？"
-            f"今天这个不一样！"
-            f"{solution}！"
-            f"吊打市面产品！"
-            f"别人卖{original_price}！"
-            f"我们只要{price}！"
-            f"{gift}！"
-            f"性价比之王！"
-            f"不买亏了！"
-            f"有同感的扣1！"
-            f"对比一下！"
-            f"真的不一样！"
+            f"你们用过{category['name']}吗？"  # 互动
+            f"{pain}对不对？"  # 互动
+            f"是不是？"  # 互动
+            f"今天这个不一样！"  # 对比
+            f"{solution}！"  # 卖点
+            f"吊打市面产品！"  # 口语
+            f"别人卖{original_price}！"  # 价格锚定
+            f"我们只要{price}！"  # 逼单
+            f"{gift}！"  # 福利
+            f"性价比之王！"  # 口语
+            f"不买亏了！"  # 口语
+            f"有同感的扣1！"  # 互动
+            f"对比一下！"  # 互动
+            f"真的不一样！"  # 口语
         )
 
-    # 确保有互动指令（每 2-3 句插入一次）
+    # 确保有互动指令（每 2 句插入一次，增加互动密度）
     sentences = [s for s in script.split("！") if s.strip()]
     final_sentences = []
 
     for i, sent in enumerate(sentences):
         final_sentences.append(sent.strip())
-        # 每 2-3 句插入互动，且不要在最后 2 句插入
-        if i > 0 and (i + 1) % 3 == 0 and i < len(sentences) - 2:
+        # 每 2 句插入互动，且不要在最后 2 句插入
+        if i > 0 and (i + 1) % 2 == 0 and i < len(sentences) - 2:
             final_sentences.append(generate_interaction(style, target))
 
     script = "！".join(final_sentences) + "！"
