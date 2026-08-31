@@ -1,0 +1,142 @@
+{
+  "model_name": "SFT模型",
+  "timestamp": "2026-08-31T14:11:14.418762",
+  "benchmark_size": 3,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "当然，让我来为你打造一段1分钟的口红产品短文：\n\n---\n\n你是否渴望在约会前能有一支能打能扛的口红？今天，我向你推荐这支明星同款——显白不拔干口红！它的显白效果能让你的气色瞬间提升，仿佛自带滤镜；而\"不拔干\"的承诺，更是那些干皮姐妹的福音，让你的妆容更加服帖。只需轻轻一点，就能让色彩饱满绽放；搭配其顺滑的质地，上妆时你会惊喜地发现，成妆效果比专柜还要好！所以，无论你是想要日常通勤的百搭，还是约会时的高光，这支口红都能满足你的需求。现在，就给你的妆容来个升级吧！\n\n---\n\n这段短文简短明了地突出了产品的卖点，同时通过情绪化语言激发了消费者的购买欲望。",
+      "metrics": {
+        "interactive_density": 0.1,
+        "avg_sentence_len": 27.9,
+        "spoken_ratio": 0.0143,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.3,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 10,
+        "char_count": 279,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 6/10"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "【画外音】冬天的空气干燥如尘，你是否渴望那一抹水润？今天，我们有款面膜，急救补水的能耐，用完你会回来谢我们！玻尿酸的成分，30秒渗透，让你的底妆服帖到不行！所以，如果你想要好效果，现在就是最后机会——急救面膜，玻尿酸精华，30秒急救，最后一波库存，最后一波10单，库存见底，买完即止！来，乘着最后一波的风，给自己一个水润的承诺！",
+      "metrics": {
+        "interactive_density": 0.2,
+        "avg_sentence_len": 32.8,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 5,
+        "char_count": 164,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 5/5"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "好的，我将用2分钟的时间来为这个防晒霜产品写一个短广告脚本，针对油皮女生这个目标人群。\n\n---\n\n画外音：你是否对市面上大部分防晒霜都有同一种抱怨——黏腻厚重？今天，我来向你推荐一个完全不同的产品——SPF50+、3秒成膜、不油腻的防晒霜！这个产品将彻底改变你对防晒霜的固有印象，让你在保护皮肤的同时，还能享受轻盈通透的使用体验！\n\n视频画面：快速切换到产品的特写镜头。首先，我们看到防晒霜的包装设计——简约而不失时尚，这正是油皮女生所追求的风格。\n\n旁白：这个防晒霜的SPF值高达50+，能有效阻挡紫外线，保护你的皮肤免受晒黑的风险。在你最需要它的时候，它能提供强大的防护力。\n\n视频画面：演示3秒成膜的过程。用手指轻轻按压产品，然后迅速涂抹于面部，你会看到奇迹般的效果——3秒内，防晒霜迅速成膜，形成一层透明的保护层。\n\n旁白：3秒成膜，这个功能能有效防止汗水和紫外线的侵袭，让你在运动或户外活动时也能保持防护。\n\n视频画面：特写镜头展示防晒霜的质地——轻薄透明，完全不油腻。用手摸上去，你会明显感觉到与市面上大部分防晒霜的不同。\n\n旁",
+      "metrics": {
+        "interactive_density": 0.067,
+        "avg_sentence_len": 31.4,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.6,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 15,
+        "char_count": 471,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 10/15"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.122,
+      "std": 0.057,
+      "min": 0.067,
+      "max": 0.2
+    },
+    "avg_sentence_len": {
+      "mean": 30.7,
+      "std": 2.061,
+      "min": 27.9,
+      "max": 32.8
+    },
+    "spoken_ratio": {
+      "mean": 0.005,
+      "std": 0.007,
+      "min": 0.0,
+      "max": 0.014
+    },
+    "structure_completeness": {
+      "mean": 3.667,
+      "std": 0.471,
+      "min": 3.0,
+      "max": 4.0
+    },
+    "selling_point_coverage": {
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "emotion_progression": {
+      "mean": 3.967,
+      "std": 0.741,
+      "min": 3.3,
+      "max": 5.0
+    },
+    "catchphrase_repeat": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "sentence_count": {
+      "mean": 10.0,
+      "std": 4.082,
+      "min": 5.0,
+      "max": 15.0
+    },
+    "char_count": {
+      "mean": 304.667,
+      "std": 126.639,
+      "min": 164.0,
+      "max": 471.0
+    },
+    "fluency_score": {
+      "mean": 3.333,
+      "std": 0.471,
+      "min": 3.0,
+      "max": 4.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 6/10",
+      "unique_count": 3
+    }
+  }
+}

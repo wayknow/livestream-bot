@@ -1,0 +1,142 @@
+{
+  "model_name": "基座模型",
+  "timestamp": "2026-08-31T14:09:05.839696",
+  "benchmark_size": 3,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "【产品介绍】\n大家好，今天我要给大家推荐一款非常受欢迎的口红——“亮彩显白保湿口红”。这款口红不仅能够让你的肤色看起来更加明亮、白皙，而且持久保湿，不会让嘴唇感到干燥不适。接下来，就让我来为大家详细介绍它的特点和使用感受。\n\n【卖点展示】\n1. **显白效果**：这款口红采用了特殊的色彩配方，能够有效提亮肤色，让你在任何场合下都自信满满，展现最美的自己。\n2. **不拔干，滋润保湿**：特别添加了天然植物精华，能够深层滋润双唇，为干燥的冬季或长时间外出提供持久的保湿效果，让你的嘴唇时刻保持水润舒适。\n\n【使用场景推荐】\n无论你是在办公室工作，还是参加朋友聚会，甚至是逛街购物，这款口红都能为你增添一抹亮丽的色彩。它不仅适合日常使用，也非常适合特殊场合，让你无论走到哪里都能成为焦点。\n\n【结束语】\n总的来说，“亮彩显白保湿口红”以其独特的显白效果和持久保湿的特性，成为了众多爱美人士的首选。如果你也想拥有更加明亮自然的肤色，不妨尝试一下这款口红，相信它能够给你带来不一样的体验。谢谢大家的观看，希望我的介绍对您有所帮助。",
+      "metrics": {
+        "interactive_density": 0.071,
+        "avg_sentence_len": 33.1,
+        "spoken_ratio": 0.0065,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 4.4,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 14,
+        "char_count": 463,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 9/14"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "【视频脚本】\n\n[画面上，展示一瓶紧闭的面膜瓶，瓶身上的产品名称在灯光下清晰可见]\n\n旁白：（温柔而充满吸引力的声音）“当干燥的空气和忙碌的生活让你的肌肤感到紧绷时...”\n\n[屏幕上，画面切换至一位女性模特，她正对着镜子，脸部紧绷，眼神略显疲惫]\n\n旁白：...“只需一瓶我们的急救补水面膜，就能让肌肤瞬间恢复活力。”\n\n[镜头拉近，展示面膜瓶，瓶盖打开，瓶内透明的液体中可以看到微小的颗粒，是玻尿酸]\n\n旁白：（声音中带有专业感）“特别添加的玻尿酸，密集补水，深层滋养，迅速为肌肤补充水分。”\n\n[画面变为特写，展示面膜与模特的脸贴合，面膜上的精华液慢慢渗透至模特的肌肤]\n\n旁白：（温柔、充满期待）“只需几分钟，肌肤立现水润光泽，紧绷感瞬间消失。”\n\n[镜头再次拉近，展示模特满意地微笑，眼神变得柔和]\n\n旁白：（鼓励的语气）“现在，最后10单，限时优惠，赶快行动吧！别让肌肤错过这一刻的水润奇迹。”\n\n[画面转为背景色，展示产品名称、优惠信息和最后10单的倒计时]\n\n旁白：（坚定、鼓励的声音）“最后10单，抓紧时间！”",
+      "metrics": {
+        "interactive_density": 0.0,
+        "avg_sentence_len": 24.4,
+        "spoken_ratio": 0.0022,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 19,
+        "char_count": 464,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 12/19"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "好的，让我们来设计一段2分钟的视频脚本，重点突出防晒霜的卖点，特别针对油皮女生的需求。视频将分为几个部分：引言、产品介绍、产品使用演示、使用体验分享以及结束语。\n\n**视频脚本：**\n\n【视频开头，镜头慢慢拉近到一款透明的防晒霜瓶上，背景是夏日海边的风景】\n\n旁白：夏日炎炎，阳光炙热，如何在保护肌肤的同时，还能拥有清爽不油腻的肌肤体验？今天，就来给大家推荐一款专为油皮女生设计的防晒霜。\n\n【镜头切到瓶身特写，展示产品名称和SPF50+标识】\n\n旁白：这款防晒霜的SPF值高达50+，能够有效阻挡紫外线，预防晒黑和晒伤。而且，它还拥有3秒快速成膜的神奇能力，不需要等待，上脸即刻拥有保护。\n\n【镜头切换至透明瓶口，摇晃几下瓶身，展示质地】\n\n旁白：更贴心的是，这款防晒霜质地轻薄，上脸后几乎无感，不会给油皮肌肤带来额外的负担，更不会让皮肤感到油腻。\n\n【镜头切到模特面部特写，手拿瓶子正在用防晒霜】\n\n旁白：接下来，我们来一起看看它怎么使用。只需取适量，轻轻涂抹于面部，无需用力按压，很快就能形成一层保护",
+      "metrics": {
+        "interactive_density": 0.071,
+        "avg_sentence_len": 32.4,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 3,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.6,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 14,
+        "char_count": 453,
+        "fluency_score": 3,
+        "fluency_reason": "长句数: 12/14"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.047,
+      "std": 0.033,
+      "min": 0.0,
+      "max": 0.071
+    },
+    "avg_sentence_len": {
+      "mean": 29.967,
+      "std": 3.947,
+      "min": 24.4,
+      "max": 33.1
+    },
+    "spoken_ratio": {
+      "mean": 0.003,
+      "std": 0.003,
+      "min": 0.0,
+      "max": 0.006
+    },
+    "structure_completeness": {
+      "mean": 3.0,
+      "std": 0.0,
+      "min": 3.0,
+      "max": 3.0
+    },
+    "selling_point_coverage": {
+      "mean": 0.889,
+      "std": 0.157,
+      "min": 0.667,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "emotion_progression": {
+      "mean": 4.333,
+      "std": 0.573,
+      "min": 3.6,
+      "max": 5.0
+    },
+    "catchphrase_repeat": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "sentence_count": {
+      "mean": 15.667,
+      "std": 2.357,
+      "min": 14.0,
+      "max": 19.0
+    },
+    "char_count": {
+      "mean": 460.0,
+      "std": 4.967,
+      "min": 453.0,
+      "max": 464.0
+    },
+    "fluency_score": {
+      "mean": 3.0,
+      "std": 0.0,
+      "min": 3.0,
+      "max": 3.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 9/14",
+      "unique_count": 3
+    }
+  }
+}
