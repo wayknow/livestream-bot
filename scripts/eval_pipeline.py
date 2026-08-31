@@ -67,6 +67,12 @@ COMMON_NUMBERS = {
     "10000", "20000", "30", "60", "90", "120", "180", "360"
 }
 
+# 时间相关的数字模式（不计入幻觉）
+TIME_PATTERNS = [
+    r'\d+秒', r'\d+分钟', r'\d+小时', r'\d+天', r'\d+周', r'\d+月',
+    r'第\d+', r'前\d+', r'后\d+'
+]
+
 
 class LiveStreamEvaluator:
     """直播话术评估器"""
@@ -127,12 +133,20 @@ class LiveStreamEvaluator:
         covered_points = sum(1 for sp in prompt_selling_points if sp in text)
         selling_point_coverage = round(covered_points / max(len(prompt_selling_points), 1), 3)
 
-        # 6. 幻觉率
+        # 6. 幻觉率（排除时间相关的数字）
         nums_in_output = set(re.findall(r'\d+', text))
         # 从 prompt 提取所有数字
         nums_in_prompt = set(re.findall(r'\d+', prompt))
-        # 检查不在 prompt 中且不是常见数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS
+        # 排除时间相关的数字（如"15秒"、"30分钟"等）
+        time_related_nums = set()
+        for pattern in TIME_PATTERNS:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                num = re.findall(r'\d+', match)
+                if num:
+                    time_related_nums.update(num)
+        # 检查不在 prompt 中且不是常见数字且不是时间相关数字的
+        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）
