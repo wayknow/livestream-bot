@@ -1,0 +1,184 @@
+{
+  "model_name": "KTO测试2",
+  "timestamp": "2026-09-02T17:13:20.466905",
+  "benchmark_size": 5,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "平静：口红家人们，今天给大家种草的是一款超级显白的口红。对不对？\n兴奋：这款不拔干，持久不脱色，简直就是秋冬必备神器！有没有？\n急促：家人们，今天最后一波，限时抢购！快来下单吧！扣1\n平静：咱们家的口红采用顶级的配方，每一款都是精心挑选，保证显白效果。对不对？\n兴奋：真的绝了，一抹上唇，瞬间透亮，就像天生丽质一样！有没有？\n急促：家人们，今天最后200个名额，赶紧下单哦！扣1\n平静：这款口红不仅显白，而且超级滋润，不干燥，适合各种肤质。对不对？\n兴奋：真的绝了，试了都说好，现在买简直不要太划算！有没有？\n急促：家人们，最后的最后，今天最后一波，赶紧下单吧！扣1\n平静：价格方面，我们这款口红官方售价199元，现在买只需要199元。对不对？\n兴奋：真的绝了，199元就能拥有一款显白又滋润的口红，真的是物超所值！有没有？\n急促：家人们，最后的最后，今天最后一波，赶紧下单哦！扣1",
+      "metrics": {
+        "interactive_density": 0.2,
+        "avg_sentence_len": 15.6,
+        "spoken_ratio": 0.0409,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "emotion_progression": 4.2,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 25,
+        "char_count": 391,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 3/25 (12%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "好的，我明白了。以下是30秒的带货话术示例：\n\n平静：家人们，你们好！\n\n兴奋：急救补水面膜，玻尿酸满满！\n\n急促：今天最后一波，想买的家人们，快来！\n\n互动指令：扣1\n\n平静：用它，让你的肌肤瞬间恢复水润！\n\n兴奋：现在下单，享受限时优惠，价格抄下来！\n\n急促：有没有心动的家人们，快来抢！\n\n互动指令：对不对\n\n平静：每一瓶都含有高浓度玻尿酸，补水效果超好！\n\n兴奋：这么好的东西，错过可惜哦！\n\n急促：听我说，今天最后10单，手慢无！\n\n互动指令：有没有\n\n平静：敷上它，肌肤立刻被滋养！\n\n兴奋：快点下单，别让好产品成为过客！\n\n急促：有没有，家人们，最后的机会！\n\n互动指令：最后一波\n\n平静：家人们，赶快下单吧！\n\n兴奋：今天最后10单，机会难得！\n\n急促：有没有，现在下单，保证效果！\n\n价格逼单：家人们，限时优惠结束时间是10:00，错过不再来！\n\n这样就能在30秒内完成带货了。",
+      "metrics": {
+        "interactive_density": 0.261,
+        "avg_sentence_len": 17.3,
+        "spoken_ratio": 0.0075,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.25,
+        "emotion_progression": 4.6,
+        "catchphrase_repeat": 0.261,
+        "sentence_count": 23,
+        "char_count": 398,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23 (0%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "用户：产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生\n\n平静\n我今天给大家带来一款超级好用的防晒霜，家人们，有没有人需要呀？\n\n兴奋\n防晒霜不是每天都需要，但是一旦需要，就一定要选好用的！我知道你们都是油皮宝宝，对吧？\n\n急促\n今天这款，SPF50+，3秒成膜，不油腻，真的是绝了！有没有心动的呢？\n\n平静\n这款防晒霜，一瓶就能用一个夏天，限时优惠，不要错过，听我说，最后一波！\n\n兴奋\n现在下单，不仅能享受这个大优惠，还有特别的赠品，真的绝了，有没有人想买？\n\n急促\n今天活动，只有今天，家人们，最后一波了！有没有什么好主意？\n\n平静\n好，好，好，家人们，今天一定要下单哦，我们走吧，听了我的推荐，肯定不会后悔的！\n\n最后，为了保证效果，这款防晒霜需要趁早使用哦，家人们，最后的机会，有没有？",
+      "metrics": {
+        "interactive_density": 0.211,
+        "avg_sentence_len": 19.3,
+        "spoken_ratio": 0.0355,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 2.9,
+        "catchphrase_repeat": 0.211,
+        "sentence_count": 19,
+        "char_count": 366,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 5/19 (26%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "【平静】\n家人们，今天给大家种草一款抗皱面霜，真的绝了。\n\n【兴奋】\n扣1，它含有玻色因，7天就能让你的细纹看不见踪影。\n\n【急促】\n对不对，使用方法简单，坚持7天，你的肌肤会惊喜。\n\n【互动】\n有没有人跟我一样，肌肤问题一直困扰着你呢？\n\n【平静】\n家人们，现在下单还有限时优惠，最后100瓶哦。\n\n【兴奋】\n对不对，这个面霜真的能让你告别丑陋的皱纹。\n\n【急促】\n听我说，机会难得，限时限量，最后一波，赶紧下单吧！\n\n【互动】\n有没有心动的家人们，快来下单吧，点击屏幕右下角，支持我！",
+      "metrics": {
+        "interactive_density": 0.375,
+        "avg_sentence_len": 15.2,
+        "spoken_ratio": 0.0328,
+        "structure_completeness": 5,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 4.0,
+        "catchphrase_repeat": 0.188,
+        "sentence_count": 16,
+        "char_count": 244,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/16 (0%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "平静：家人们，今天给大家种草的是一款粉底液，它能持妆12小时，不卡粉哦。",
+      "metrics": {
+        "interactive_density": 1.0,
+        "avg_sentence_len": 36.0,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 1.0,
+        "sentence_count": 1,
+        "char_count": 36,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 1/1 (100%), 有结构标签: True"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.409,
+      "std": 0.302,
+      "min": 0.2,
+      "max": 1.0
+    },
+    "avg_sentence_len": {
+      "mean": 20.68,
+      "std": 7.796,
+      "min": 15.2,
+      "max": 36.0
+    },
+    "spoken_ratio": {
+      "mean": 0.023,
+      "std": 0.016,
+      "min": 0.0,
+      "max": 0.041
+    },
+    "structure_completeness": {
+      "mean": 4.0,
+      "std": 0.632,
+      "min": 3.0,
+      "max": 5.0
+    },
+    "selling_point_coverage": {
+      "mean": 0.9,
+      "std": 0.2,
+      "min": 0.5,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.117,
+      "std": 0.145,
+      "min": 0.0,
+      "max": 0.333
+    },
+    "emotion_progression": {
+      "mean": 3.54,
+      "std": 0.954,
+      "min": 2.0,
+      "max": 4.6
+    },
+    "catchphrase_repeat": {
+      "mean": 0.372,
+      "std": 0.315,
+      "min": 0.188,
+      "max": 1.0
+    },
+    "sentence_count": {
+      "mean": 16.8,
+      "std": 8.495,
+      "min": 1.0,
+      "max": 25.0
+    },
+    "char_count": {
+      "mean": 287.0,
+      "std": 137.279,
+      "min": 36.0,
+      "max": 398.0
+    },
+    "fluency_score": {
+      "mean": 4.8,
+      "std": 0.4,
+      "min": 4.0,
+      "max": 5.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 3/25 (12%), 有结构标签: True",
+      "unique_count": 5
+    }
+  }
+}

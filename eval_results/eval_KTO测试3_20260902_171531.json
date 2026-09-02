@@ -1,0 +1,184 @@
+{
+  "model_name": "KTO测试3",
+  "timestamp": "2026-09-02T17:15:31.359385",
+  "benchmark_size": 5,
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "平静：今天来一款口红，家人们，有没有注意过，秋冬干燥，嘴唇容易干燥脱皮。对不对？\n\n兴奋：看我这款口红，一抹就显白，真的绝了，这款不拔干，超级滋润。听我说。\n\n急促：现在就买，最后一波，有没有？家人们，这次机会难得，别错过。",
+      "metrics": {
+        "interactive_density": 0.833,
+        "avg_sentence_len": 18.7,
+        "spoken_ratio": 0.0357,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.333,
+        "sentence_count": 6,
+        "char_count": 112,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 2/6 (33%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "家人们，你是不是经常加班熬夜，肌肤干燥紧绷？（扣1）对不对，肌肤急需急救补水啊？（扣1）这瓶面膜含有顶级的玻尿酸，真的绝了，急救补水效果立竿见影！（对不对）现在下单，还有最后10单，听我说！（听我说）家人们，数量有限，错过不再有。（有没有）最后一波，立刻下单，给你肌肤满满的水润！（听我说）",
+      "metrics": {
+        "interactive_density": 0.857,
+        "avg_sentence_len": 20.7,
+        "spoken_ratio": 0.0345,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.286,
+        "sentence_count": 7,
+        "char_count": 145,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 1/7 (14%), 有结构标签: False"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "【平静】\n家人们，防晒霜选对了，才能抵御夏日的炙烤。今天推荐的这瓶防晒霜，SPF50+，真的绝了！\n【兴奋】\n3秒就能成膜，告别厚重感，这可是其他品牌无法比拟的，家人们，有没有？\n【急促】\n一定要用，这不油腻的配方，即使油皮也不怕！家人们，行动起来吧，最后一波！\n【价格逼单】\n限时优惠，原价59元，现在只要45元，不要说了，有没有！",
+      "metrics": {
+        "interactive_density": 0.3,
+        "avg_sentence_len": 16.7,
+        "spoken_ratio": 0.0419,
+        "structure_completeness": 4,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.3,
+        "sentence_count": 10,
+        "char_count": 167,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 1/10 (10%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "【平静】抗皱面霜，玻色因7天淡纹，家人们，了解一下。扣1\n\n【兴奋】玻色因是什么？真的绝了，家人们，玻色因就是抗老的明星成分。扣1\n\n【急促】7天？敢保证？家人们，我这可是7天，7天，家人们。扣1\n\n【平静】7天之后，玻色因的作用真的绝了，家人们，真的效果，家人们。扣1\n\n【兴奋】玻色因7天淡纹，真的绝了，家人们，我要开始卖货了。对不对\n\n【急促】最后三分钟，扣1\n\n【平静】700g，真的是700g，家人们，限量供应，对不对\n\n【兴奋】眼看着700g就要卖光了，家人们，立刻下单。对不对\n\n【急促】最后一波，家人们，今天下单，还有优惠。对不对\n\n【平静】家人们，冷静一下，我再给你们科普一下，对不对\n\n【兴奋】玻色因7天淡纹，真的绝了，家人们，立刻下单，真的绝了。听我说\n\n【急促】机会难得，家人们，立刻下单。有没有\n\n【平静】家人们，还有最后几秒，家人们，今天下单，还可以享受优惠。有没有\n\n【兴奋】家人们，",
+      "metrics": {
+        "interactive_density": 0.185,
+        "avg_sentence_len": 15.1,
+        "spoken_ratio": 0.0614,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.593,
+        "sentence_count": 27,
+        "char_count": 407,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 2/27 (7%), 有结构标签: True"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "平静：\n家人们，你是不是经常在晚上化妆，一晚妆容，一整天都完美？（扣1）\n扣1\n\n兴奋：\n对比其他品牌，我们的粉底液不卡粉，24小时持妆不脱妆，是不是值得尝试？（对不对）\n对不对\n\n急促：\n家人们，我们的粉底液现在最后一波，数量有限，赶紧下单，有没有？（有没有）\n有没有\n\n冷静：\n家人们，现在下单还有5分钟优惠，用过的朋友都说好，真的绝了！（听我说）\n听我说",
+      "metrics": {
+        "interactive_density": 0.375,
+        "avg_sentence_len": 11.2,
+        "spoken_ratio": 0.0222,
+        "structure_completeness": 3,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 0.0,
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.188,
+        "sentence_count": 16,
+        "char_count": 180,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 1/16 (6%), 有结构标签: True"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_density": {
+      "mean": 0.51,
+      "std": 0.28,
+      "min": 0.185,
+      "max": 0.857
+    },
+    "avg_sentence_len": {
+      "mean": 16.48,
+      "std": 3.242,
+      "min": 11.2,
+      "max": 20.7
+    },
+    "spoken_ratio": {
+      "mean": 0.039,
+      "std": 0.013,
+      "min": 0.022,
+      "max": 0.061
+    },
+    "structure_completeness": {
+      "mean": 3.4,
+      "std": 0.49,
+      "min": 3.0,
+      "max": 4.0
+    },
+    "selling_point_coverage": {
+      "mean": 0.833,
+      "std": 0.211,
+      "min": 0.5,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.067,
+      "std": 0.133,
+      "min": 0.0,
+      "max": 0.333
+    },
+    "emotion_progression": {
+      "mean": 4.3,
+      "std": 0.925,
+      "min": 2.7,
+      "max": 5.0
+    },
+    "catchphrase_repeat": {
+      "mean": 0.34,
+      "std": 0.135,
+      "min": 0.188,
+      "max": 0.593
+    },
+    "sentence_count": {
+      "mean": 13.2,
+      "std": 7.73,
+      "min": 6.0,
+      "max": 27.0
+    },
+    "char_count": {
+      "mean": 202.2,
+      "std": 104.96,
+      "min": 112.0,
+      "max": 407.0
+    },
+    "fluency_score": {
+      "mean": 5.0,
+      "std": 0.0,
+      "min": 5.0,
+      "max": 5.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 2/6 (33%), 有结构标签: True",
+      "unique_count": 5
+    }
+  }
+}
