@@ -417,7 +417,7 @@ class LiveStreamEvaluator:
         # 定义指标显示名称和目标值
         metric_config = {
             "interactive_density": {"name": "互动密度(句)", "target": "0.2-0.25", "higher_better": True},
-            "avg_sentence_len": {"name": "平均句长(字)", "target": "<15", "higher_better": False},
+            "avg_sentence_len": {"name": "平均句长(字)", "target": "15-20", "higher_better": False},
             "spoken_ratio": {"name": "口语词占比", "target": ">0.02", "higher_better": True},
             "structure_completeness": {"name": "结构完整度(0-5)", "target": ">4.5", "higher_better": True},
             "selling_point_coverage": {"name": "卖点覆盖率", "target": "0.6-0.8", "higher_better": True},
