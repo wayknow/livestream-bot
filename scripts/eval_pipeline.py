@@ -76,8 +76,17 @@ TIME_PATTERNS = [
 # 价格相关的数字模式（不计入幻觉，因为模型可能合理推测价格）
 PRICE_PATTERNS = [
     r'只要\d+', r'只要\d+元', r'卖\d+', r'卖\d+元',
-    r'只要\d+块', r'卖\d+块', r'原价\d+', r'原价\d+元'
+    r'只要\d+块', r'卖\d+块', r'原价\d+', r'原价\d+元',
+    r'\d+元', r'\d+块', r'价格\d+', r'优惠\d+',
+    r'下单\d+', r'前\d+单', r'最后\d+单'
 ]
+
+# 常见价格数字（不计入幻觉）
+COMMON_PRICE_NUMBERS = {
+    "39", "49", "59", "68", "79", "89", "99", "128", "138", "148",
+    "158", "168", "178", "188", "199", "299", "399", "499", "599",
+    "999", "1299", "1999", "2999"
+}
 
 # 互动词中的数字（不计入幻觉）
 INTERACTIVE_NUMBERS = {'666', '888', '520', '1314'}
@@ -163,7 +172,7 @@ class LiveStreamEvaluator:
                 if num:
                     price_related_nums.update(num)
         # 检查不在 prompt 中且不是常见数字且不是时间/价格/互动词相关数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS
+        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - COMMON_PRICE_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）
