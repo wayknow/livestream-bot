@@ -275,22 +275,40 @@ class LiveStreamEvaluator:
         return self._estimate_fluency(text)
 
     def _estimate_fluency(self, text: str) -> Dict:
-        """用规则估算流畅度（作为 LLM 裁判的 fallback）"""
+        """用规则估算流畅度（适配数字人直播场景）"""
         sentences = self._split_sentences(text)
-        long_sentences = [s for s in sentences if len(s) > 20]
+
+        # 数字人直播场景：句子长度可以更长（讲卖点时）
+        # 原来：>20字为长句 → 现在：>30字为长句
+        long_sentences = [s for s in sentences if len(s) > 30]
 
         # 计算流畅度（0-5）
         score = 5
-        if len(long_sentences) > len(sentences) * 0.3:
+
+        # 规则1：长句过多（>30字的句子超过40%才扣分）
+        if len(long_sentences) > len(sentences) * 0.4:
             score -= 1  # 长句过多
-        if any(re.search(r'[一-鿿]{15,}', s) for s in sentences):
-            score -= 1  # 有超过15字无标点的片段
+
+        # 规则2：无标点片段（数字人直播场景放宽到25字）
+        if any(re.search(r'[一-鿿]{25,}', s) for s in sentences):
+            score -= 1  # 有超过25字无标点的片段
+
+        # 规则3：句子太少
         if len(sentences) < 3:
             score -= 1  # 句子太少
 
+        # 规则4：有结构化标签加分（数字人直播场景）
+        structure_labels = ["平静", "兴奋", "急促", "开场", "转折", "结尾"]
+        has_structure = any(label in text for label in structure_labels)
+        if has_structure:
+            score = min(score + 1, 5)  # 加分，但不超过5分
+
+        # 计算实际长句比例
+        long_ratio = len(long_sentences) / max(len(sentences), 1)
+
         return {
             "fluency_score": max(score, 1),
-            "fluency_reason": f"长句数: {len(long_sentences)}/{len(sentences)}"
+            "fluency_reason": f"长句数: {len(long_sentences)}/{len(sentences)} ({long_ratio:.0%}), 有结构标签: {has_structure}"
         }
 
     # ========== 评估单个样本 ==========
