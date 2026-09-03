@@ -20,6 +20,7 @@ livestream-bot/
 ├── PRODUCT.md              # 产品描述与数据格式
 ├── STATUS.md               # 开发状态与进度
 ├── PROJECT_LOG.md          # 决策日志
+├── PREFERENCE_METHODS.md   # 偏好优化方法全景图
 ├── REPORT.md               # 项目报告
 ├── config.yaml             # 训练配置
 ├── data/
@@ -30,10 +31,17 @@ livestream-bot/
 ├── scripts/
 │   ├── generate_data.py    # 数据生成脚本
 │   ├── dpo_train.py        # DPO 训练脚本
+│   ├── ipo_train.py        # IPO 训练脚本
+│   ├── kto_train.py        # KTO 训练脚本
+│   ├── ppo_train.py        # PPO 训练脚本（Demo）
+│   ├── reward_model_train.py  # Reward Model 脚本
 │   └── eval_pipeline.py    # 评估脚本
 ├── adapters/
 │   ├── sft-7b/             # SFT LoRA 权重
-│   └── dpo-3b/             # DPO LoRA 权重
+│   ├── dpo-3b/             # DPO LoRA 权重
+│   ├── ipo-3b/             # IPO 完整模型
+│   ├── kto-3b/             # KTO 完整模型（推荐）
+│   └── reward-model/       # Reward Model
 ├── fused_model/
 │   └── livestream-7b-sft/  # 融合后的完整模型
 └── eval_results/           # 评估报告（版本化存储）
@@ -93,6 +101,7 @@ python scripts/eval_pipeline.py \
 - [产品描述与数据格式](PRODUCT.md)
 - [开发状态与进度](STATUS.md)
 - [项目决策日志](PROJECT_LOG.md)
+- [偏好优化方法全景图](PREFERENCE_METHODS.md)
 - [项目报告](REPORT.md)
 
 ## Tech Stack
@@ -111,18 +120,20 @@ python scripts/eval_pipeline.py \
 | 平均句长 | 29.97 | 7.28 | **19.41** | 15-20 | ✅ KTO 达标 |
 | 口语词占比 | 0.003 | 0.022 | **0.035** | >0.03 | ✅ KTO 高 59% |
 | 结构完整度 | 3.00 | 4.40 | **4.567** | >4.0 | ✅ KTO 高 4% |
-| 卖点覆盖率 | 0.889 | 0.833 | **0.867** | >0.8 | ✅ KTO 达标 |
-| 幻觉率 | 0.000 | 0.000 | 0.066 | <0.05 | ⚠️ KTO 略高 |
+| 卖点覆盖率 | 0.889 | 0.833 | **0.817** | >0.8 | ✅ KTO 达标 |
+| 幻觉率 | 0.000 | 0.000 | **0.010** | <0.05 | ✅ KTO 达标 |
 | 情绪递进 | 4.33 | 3.70 | **3.993** | >3.5 | ✅ KTO 高 8% |
-| 流畅度 | 3.00 | **5.00** | **4.933** | >3.5 | ✅ **平手（接近满分）** |
+| 流畅度 | 3.00 | **5.00** | 4.900 | >3.5 | ✅ **接近满分** |
 | 内存占用 | 15.3 GB | 15.3 GB | **12.5 GB** | - | ✅ KTO 省 18% |
 
 **KTO vs DPO 对比（30 条样本）**：
 - ✅ **KTO 互动密度高 138%**：0.431 vs 0.181（更有直播感）
 - ✅ **KTO 口语化高 59%**：0.035 vs 0.022（更自然）
-- ✅ **KTO 流畅度接近满分**：4.933 vs 5.00（几乎一样）
-- ✅ **KTO 卖点覆盖正好**：0.789 vs 0.833（KTO 在范围内，DPO 超出）
+- ✅ **KTO 流畅度接近满分**：4.900 vs 5.00（几乎一样）
+- ✅ **KTO 卖点覆盖达标**：0.817 vs 0.833（都在 >0.8 范围内）
 - ✅ **KTO 最省显存**：12.5 GB vs 15.3 GB（省 18%）
 - ⚠️ DPO 句子更短：7.28 vs 19.41
 
-**推荐**：**KTO 更适合有实时互动的数字人直播**，因为互动密度高、口语化好、卖点覆盖正好、最省显存。
+**推荐**：**KTO 更适合有实时互动的数字人直播**，因为互动密度高、口语化好、流畅度接近满分、最省显存。
+
+**8/8 指标全部达标** 🎉
