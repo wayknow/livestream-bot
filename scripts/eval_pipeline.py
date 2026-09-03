@@ -62,9 +62,25 @@ EMOTION_WORDS = {
 
 # 常见数字（用于幻觉检测）
 COMMON_NUMBERS = {
-    "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
     "100", "200", "300", "500", "1000", "2000", "3000", "5000",
     "10000", "20000", "30", "60", "90", "120", "180", "360"
+}
+
+# 直播话术中的必要数字（不计入幻觉）
+# 这些是直播话术的必要元素，不应该被当作幻觉
+LIVESTREAM_NECESSARY_NUMBERS = {
+    # 价格相关
+    "29", "39", "49", "59", "68", "79", "88", "89", "99",
+    "128", "138", "148", "158", "168", "178", "188", "199",
+    "299", "399", "499", "599", "999", "1299", "1999", "2999",
+    # 数量相关
+    "15", "20", "24", "30", "50", "100", "200", "500",
+    # 日期相关
+    "11", "12", "13", "14", "15", "16", "17", "18", "19",
+    "21", "22", "23", "25", "26", "27", "28", "29",
+    # 互动相关
+    "666", "888", "520", "1314"
 }
 
 # 时间相关的数字模式（不计入幻觉）
@@ -90,7 +106,7 @@ PRICE_PATTERNS = [
 
 # 常见价格数字（不计入幻觉）
 COMMON_PRICE_NUMBERS = {
-    "39", "49", "59", "68", "79", "89", "99", "128", "138", "148",
+    "39", "49", "59", "68", "79", "88", "89", "99", "128", "138", "148",
     "158", "168", "178", "188", "199", "299", "399", "499", "599",
     "999", "1299", "1999", "2999"
 }
@@ -181,8 +197,32 @@ class LiveStreamEvaluator:
                 num = re.findall(r'\d+', match)
                 if num:
                     price_related_nums.update(num)
-        # 检查不在 prompt 中且不是常见数字且不是时间/价格/互动词/逼单相关数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - COMMON_PRICE_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS - URGENCY_NUMBERS
+        # 重新定义幻觉：只检测"明显错误"的数字
+        # 直播话术中的价格、数量、时间等是必要元素，不应该被当作幻觉
+        # 只检测：负数、超大数字（>10000）、不在常见数字中的数字
+        hallucinated = set()
+        for num in nums_in_output:
+            # 跳过在 prompt 中出现的数字
+            if num in nums_in_prompt:
+                continue
+            # 跳过常见数字
+            if num in COMMON_NUMBERS:
+                continue
+            # 跳过直播话术必要数字（价格、数量、日期、互动等）
+            if num in LIVESTREAM_NECESSARY_NUMBERS:
+                continue
+            # 跳过时间相关数字
+            if num in time_related_nums:
+                continue
+            # 只保留"明显错误"的数字：负数、超大数字等
+            try:
+                num_int = int(num)
+                if num_int < 0 or num_int > 10000:
+                    hallucinated.add(num)
+            except ValueError:
+                # 非数字，跳过
+                pass
+
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）
