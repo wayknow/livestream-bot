@@ -72,7 +72,12 @@ TIME_PATTERNS = [
     r'\d+秒', r'\d+分钟', r'\d+小时', r'\d+天', r'\d+周', r'\d+月',
     r'第\d+', r'前\d+', r'后\d+',
     r'\d{2}:\d{2}',  # 时间戳格式，如 03:24
-    r'\d{2}:\d{2}:\d{2}'  # 完整时间戳，如 03:24:36
+    r'\d{2}:\d{2}:\d{2}',  # 完整时间戳，如 03:24:36
+    r'\d{4}年\d{1,2}月\d{1,2}日',  # 日期格式，如 2024年12月18日
+    r'\d{1,2}月\d{1,2}日',  # 简化日期，如 12月18日
+    r'\d{4}-\d{1,2}-\d{1,2}',  # 横线日期，如 2024-12-18
+    r'\d{1,2}/\d{1,2}/\d{4}',  # 斜线日期，如 12/18/2024
+    r'\d{4}/\d{1,2}/\d{1,2}'  # 斜线日期，如 2024/12/18
 ]
 
 # 价格相关的数字模式（不计入幻觉，因为模型可能合理推测价格）
@@ -92,6 +97,9 @@ COMMON_PRICE_NUMBERS = {
 
 # 互动词中的数字（不计入幻觉）
 INTERACTIVE_NUMBERS = {'666', '888', '520', '1314'}
+
+# 逼单话术中的数字（不计入幻觉，如"最后50单"、"15件"等）
+URGENCY_NUMBERS = {'15', '20', '24', '30', '50', '100', '200', '500'}
 
 
 class LiveStreamEvaluator:
@@ -173,8 +181,8 @@ class LiveStreamEvaluator:
                 num = re.findall(r'\d+', match)
                 if num:
                     price_related_nums.update(num)
-        # 检查不在 prompt 中且不是常见数字且不是时间/价格/互动词相关数字的
-        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - COMMON_PRICE_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS
+        # 检查不在 prompt 中且不是常见数字且不是时间/价格/互动词/逼单相关数字的
+        hallucinated = nums_in_output - nums_in_prompt - COMMON_NUMBERS - COMMON_PRICE_NUMBERS - time_related_nums - price_related_nums - INTERACTIVE_NUMBERS - URGENCY_NUMBERS
         hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
 
         # 7. 情绪词分布（递进检测）
