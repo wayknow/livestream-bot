@@ -1,314 +1,260 @@
 #!/usr/bin/env python3
-"""
-直播话术评估体系 - 完整可运行版本
-包含：8个硬指标（规则引擎）+ 2个软指标（LLM裁判）
+"""Livestream script evaluation pipeline, protocol v2.
+
+Changes from the historical v1 evaluator:
+- one frozen system prompt for every model and every sample;
+- interaction density is the fraction of sentences containing an interactive
+  cue, bounded to [0, 1];
+- hallucination detection flags any number that is not grounded in the prompt;
+- fluency is explicitly reported as rule-based unless --judge-model is given;
+- reports carry metric_version, prompt_version, git commit and model paths so
+  numbers from different runs cannot be mixed silently.
 """
 
+from __future__ import annotations
+
+import argparse
+import hashlib
 import json
 import re
-import os
-import sys
-import numpy as np
-from pathlib import Path
-from typing import Dict, List, Tuple
-from datetime import datetime
 import subprocess
+import sys
+from collections import Counter
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
 
-# ========== 配置 ==========
-PROJECT_ROOT = Path(__file__).parent.parent
+import numpy as np
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 BENCHMARK_PATH = PROJECT_ROOT / "data" / "benchmark_prompts.jsonl"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results"
 
-# 固定词库（永不更改）
+METRIC_VERSION = "2.0"
+PROMPT_VERSION = "livestream-v2"
+
+SYSTEM_PROMPT = """你是一位抖音直播带货话术专家。你的风格特征：
+①短句为主，每句不超过15字
+②每3句话插入一次互动指令（"扣1"、"对不对"、"听我说"）
+③先讲痛点场景，再给解决方案，最后价格逼单
+④情绪递进：平静→兴奋→急促
+⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有
+⑥价格、数量、时间等具体信息只能来自用户输入；用户没给就不要编造。"""
+
 INTERACTIVE_WORDS = [
     "扣1", "扣个1", "有没有", "想要的", "打想要", "对不对", "是不是",
-    "让我看看", "姐妹们", "家人们", "听我说", "来", "看过来"
+    "让我看看", "姐妹们", "家人们", "听我说", "看过来",
 ]
 
 SPOKEN_WORDS = [
     "了", "呢", "吧", "啊", "啦", "嘛", "我跟你说", "真的", "绝了",
-    "好用到哭", "太香了", "真的绝", "绝绝子", "yyds", "nice"
+    "好用到哭", "太香了", "真的绝", "绝绝子", "yyds", "nice",
 ]
 
-STRUCTURE_KEYWORDS = {
-    "痛点场景": [
-        "有没有发现", "是不是", "困扰", "烦恼", "痛点", "最怕",
-        "崩溃", "烦", "焦虑", "担心", "问题"
-    ],
-    "解决方案": [
-        "解决", "帮你", "只要", "采用", "有效", "能", "可以",
-        "这个", "今天", "推荐"
-    ],
-    "价格锚定": [
-        "原价", "平时", "专柜", "今天", "直播间", "只要",
-        "便宜", "划算", "性价比", "买", "送"
-    ],
-    "限时福利": [
-        "前", "单", "限量", "最后一波", "倒计时", "最后",
-        "库存", "告急", "卖完", "补不到"
-    ],
-    "行动指令": [
-        "3", "2", "1", "上链接", "去拍", "赶紧", "快",
-        "冲", "抢", "下单"
-    ]
+STRUCTURE_PATTERNS = {
+    "痛点场景": r"有没有发现|是不是|最怕|烦恼|困扰|痛点|崩溃|尴尬|难看|不舒服|问题",
+    "解决方案": r"解决|帮你|这款|这个产品|采用|配方|设计|技术|材质|成分|可以",
+    "价格锚定": r"原价|平时|专柜|日常价|直播间|到手价|只要|仅需|优惠|划算|性价比",
+    "限时福利": r"最后|限量|库存|卖完|补货|倒计时|前\d+单|仅剩",
+    "行动指令": r"下单|拍|抢|冲|链接|购物车|赶紧|立刻|马上",
 }
 
-# 情绪词库
 EMOTION_WORDS = {
     "平静": ["来", "今天", "这个", "大家好", "产品", "卖点"],
     "兴奋": ["绝了", "真的", "直接", "太香了", "好用到哭", "绝绝子", "yyds"],
-    "急促": ["最后", "快", "3", "2", "1", "上链接", "冲", "抢", "赶紧", "倒计时"]
+    "急促": ["最后", "快", "上链接", "冲", "抢", "赶紧", "倒计时", "321", "3、2、1"],
 }
 
-# 常见数字（用于幻觉检测）
-COMMON_NUMBERS = {
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
-    "100", "200", "300", "500", "1000", "2000", "3000", "5000",
-    "10000", "20000", "30", "60", "90", "120", "180", "360"
+INTERACTION_SAFE_NUMBERS = {1, 2, 3, 6, 8, 9, 520, 666, 888, 1314}
+
+TARGETS = {
+    "interactive_sentence_ratio": {"label": "互动句占比", "lower": 0.30, "upper": 0.60},
+    "avg_sentence_len": {"label": "平均句长(字)", "lower": 15.0, "upper": 25.0},
+    "spoken_ratio": {"label": "口语词占比", "lower": 0.02},
+    "structure_completeness": {"label": "结构完整度(0-5)", "lower": 4.0},
+    "selling_point_coverage": {"label": "卖点覆盖率", "lower": 0.80},
+    "hallucination_rate": {"label": "幻觉率", "upper": 0.10},
+    "emotion_progression": {"label": "情绪递进(0-5)", "lower": 3.5},
+    "catchphrase_repeat": {"label": "口头禅重复度", "upper": 0.30},
+    "fluency_score": {"label": "流畅度(0-5)", "lower": 3.5},
 }
 
-# 直播话术中的必要数字（不计入幻觉）
-# 这些是直播话术的必要元素，不应该被当作幻觉
-LIVESTREAM_NECESSARY_NUMBERS = {
-    # 价格相关
-    "29", "39", "49", "59", "68", "79", "88", "89", "99",
-    "128", "138", "148", "158", "168", "178", "188", "199",
-    "299", "399", "499", "599", "999", "1299", "1999", "2999",
-    # 数量相关
-    "15", "20", "24", "30", "50", "100", "200", "500",
-    # 日期相关
-    "11", "12", "13", "14", "15", "16", "17", "18", "19",
-    "21", "22", "23", "25", "26", "27", "28", "29",
-    # 互动相关
-    "666", "888", "520", "1314"
-}
 
-# 时间相关的数字模式（不计入幻觉）
-TIME_PATTERNS = [
-    r'\d+秒', r'\d+分钟', r'\d+小时', r'\d+天', r'\d+周', r'\d+月',
-    r'第\d+', r'前\d+', r'后\d+',
-    r'\d{2}:\d{2}',  # 时间戳格式，如 03:24
-    r'\d{2}:\d{2}:\d{2}',  # 完整时间戳，如 03:24:36
-    r'\d{4}年\d{1,2}月\d{1,2}日',  # 日期格式，如 2024年12月18日
-    r'\d{1,2}月\d{1,2}日',  # 简化日期，如 12月18日
-    r'\d{4}-\d{1,2}-\d{1,2}',  # 横线日期，如 2024-12-18
-    r'\d{1,2}/\d{1,2}/\d{4}',  # 斜线日期，如 12/18/2024
-    r'\d{4}/\d{1,2}/\d{1,2}'  # 斜线日期，如 2024/12/18
-]
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
-# 价格相关的数字模式（不计入幻觉，因为模型可能合理推测价格）
-PRICE_PATTERNS = [
-    r'只要\d+', r'只要\d+元', r'卖\d+', r'卖\d+元',
-    r'只要\d+块', r'卖\d+块', r'原价\d+', r'原价\d+元',
-    r'\d+元', r'\d+块', r'价格\d+', r'优惠\d+',
-    r'下单\d+', r'前\d+单', r'最后\d+单'
-]
 
-# 常见价格数字（不计入幻觉）
-COMMON_PRICE_NUMBERS = {
-    "39", "49", "59", "68", "79", "88", "89", "99", "128", "138", "148",
-    "158", "168", "178", "188", "199", "299", "399", "499", "599",
-    "999", "1299", "1999", "2999"
-}
+def _git_commit() -> str:
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return result.stdout.strip() if result.returncode == 0 else "unknown"
+    except Exception:
+        return "unknown"
 
-# 互动词中的数字（不计入幻觉）
-INTERACTIVE_NUMBERS = {'666', '888', '520', '1314'}
 
-# 逼单话术中的数字（不计入幻觉，如"最后50单"、"15件"等）
-URGENCY_NUMBERS = {'15', '20', '24', '30', '50', '100', '200', '500'}
+def _git_dirty() -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return result.returncode == 0 and bool(result.stdout.strip())
+    except Exception:
+        return True
+
+
+def _evaluator_sha256() -> str:
+    return _sha256_file(Path(__file__).resolve())
+
+
+def _normalize(text: str) -> str:
+    return re.sub(r"\s+", "", text)
+
+
+def _target_passes(key: str, value: float) -> bool:
+    spec = TARGETS.get(key)
+    if spec is None:
+        return True
+    if "lower" in spec and value < spec["lower"]:
+        return False
+    if "upper" in spec and value > spec["upper"]:
+        return False
+    return True
 
 
 class LiveStreamEvaluator:
     """直播话术评估器"""
 
-    def __init__(self, benchmark_path: str = None):
-        """初始化评估器"""
-        self.benchmark_path = benchmark_path or BENCHMARK_PATH
+    def __init__(self, benchmark_path: str | Path | None = None):
+        self.benchmark_path = Path(benchmark_path) if benchmark_path else BENCHMARK_PATH
         self.benchmark = self._load_benchmark()
         EVAL_RESULTS_DIR.mkdir(exist_ok=True)
 
     def _load_benchmark(self) -> List[Dict]:
-        """加载固定 benchmark 测试集"""
         if not self.benchmark_path.exists():
             raise FileNotFoundError(f"Benchmark 文件不存在: {self.benchmark_path}")
+        with open(self.benchmark_path, encoding="utf-8") as handle:
+            return [json.loads(line) for line in handle if line.strip()]
 
-        with open(self.benchmark_path, "r", encoding="utf-8") as f:
-            return [json.loads(line) for line in f if line.strip()]
-
-    # ========== 硬指标（规则引擎，100% 稳定） ==========
-
-    def _split_sentences(self, text: str) -> List[str]:
-        """分割句子"""
-        sentences = re.split(r'[。！？\n]', text)
-        return [s.strip() for s in sentences if s.strip()]
+    @staticmethod
+    def _split_sentences(text: str) -> List[str]:
+        sentences = re.split(r"[。！？!?\n]+", text)
+        return [sentence.strip() for sentence in sentences if sentence.strip()]
 
     def hard_metrics(self, text: str, prompt: str) -> Dict:
-        """计算所有硬指标"""
         sentences = self._split_sentences(text)
         total_chars = len(text)
         total_sentences = max(len(sentences), 1)
 
-        # 1. 互动指令密度
-        inter_count = sum(1 for w in INTERACTIVE_WORDS if w in text)
-        interactive_density = round(inter_count / total_sentences, 3)
+        interactive_sentences = sum(
+            1 for sentence in sentences if any(word in sentence for word in INTERACTIVE_WORDS)
+        )
+        interactive_ratio = round(interactive_sentences / total_sentences, 3)
 
-        # 2. 平均句长
         avg_sentence_len = round(total_chars / total_sentences, 1)
-
-        # 3. 口语词占比
-        spoken_count = sum(text.count(w) for w in SPOKEN_WORDS)
+        spoken_count = sum(text.count(word) for word in SPOKEN_WORDS)
         spoken_ratio = round(spoken_count / max(total_chars, 1), 4)
 
-        # 4. 结构完整度（0-5）
-        structure_score = 0
-        matched_structure = []
-        for dim, keywords in STRUCTURE_KEYWORDS.items():
-            if any(kw in text for kw in keywords):
-                structure_score += 1
-                matched_structure.append(dim)
+        structure_score = sum(
+            1 for pattern in STRUCTURE_PATTERNS.values() if re.search(pattern, text)
+        )
 
-        # 5. 卖点覆盖率
-        # 从 prompt 提取卖点（假设卖点在"卖点："之后）
-        prompt_selling_points = []
+        selling_points: List[str] = []
         if "卖点：" in prompt:
-            sp_part = prompt.split("卖点：")[1].split("；")[0].split("；")[0]
-            prompt_selling_points = [s.strip() for s in sp_part.replace("、", ",").split(",") if s.strip()]
+            part = prompt.split("卖点：", 1)[1].split("；", 1)[0]
+            selling_points = [item.strip() for item in part.replace("、", ",").split(",") if item.strip()]
+        normalized_text = _normalize(text)
+        covered = sum(1 for point in selling_points if _normalize(point) in normalized_text)
+        selling_coverage = round(covered / max(len(selling_points), 1), 3)
 
-        covered_points = sum(1 for sp in prompt_selling_points if sp in text)
-        selling_point_coverage = round(covered_points / max(len(prompt_selling_points), 1), 3)
-
-        # 6. 幻觉率（排除时间相关和价格相关的数字）
-        nums_in_output = set(re.findall(r'\d+', text))
-        # 从 prompt 提取所有数字
-        nums_in_prompt = set(re.findall(r'\d+', prompt))
-        # 排除时间相关的数字（如"15秒"、"30分钟"等）
-        time_related_nums = set()
-        for pattern in TIME_PATTERNS:
-            matches = re.findall(pattern, text)
-            for match in matches:
-                num = re.findall(r'\d+', match)
-                if num:
-                    time_related_nums.update(num)
-        # 排除价格相关的数字（如"只要79"、"卖49"等）
-        price_related_nums = set()
-        for pattern in PRICE_PATTERNS:
-            matches = re.findall(pattern, text)
-            for match in matches:
-                num = re.findall(r'\d+', match)
-                if num:
-                    price_related_nums.update(num)
-        # 重新定义幻觉：只检测"明显错误"的数字
-        # 直播话术中的价格、数量、时间等是必要元素，不应该被当作幻觉
-        # 只检测：负数、超大数字（>10000）、不在常见数字中的数字
-        hallucinated = set()
-        for num in nums_in_output:
-            # 跳过在 prompt 中出现的数字
-            if num in nums_in_prompt:
+        output_numbers = sorted(set(re.findall(r"\d+(?:\.\d+)?", text)))
+        prompt_numbers = set(re.findall(r"\d+(?:\.\d+)?", prompt))
+        hallucinated: List[str] = []
+        for number in output_numbers:
+            if number in prompt_numbers:
                 continue
-            # 跳过常见数字
-            if num in COMMON_NUMBERS:
-                continue
-            # 跳过直播话术必要数字（价格、数量、日期、互动等）
-            if num in LIVESTREAM_NECESSARY_NUMBERS:
-                continue
-            # 跳过时间相关数字
-            if num in time_related_nums:
-                continue
-            # 只保留"明显错误"的数字：负数、超大数字等
             try:
-                num_int = int(num)
-                if num_int < 0 or num_int > 10000:
-                    hallucinated.add(num)
+                value = float(number)
             except ValueError:
-                # 非数字，跳过
-                pass
-
-        hallucination_rate = round(len(hallucinated) / max(len(nums_in_output), 1), 3)
-
-        # 7. 情绪词分布（递进检测）
-        emotion_score = self._emotion_progression_score(text)
-
-        # 8. 口头禅重复度
-        catchphrases = ["家人们", "我跟你说", "真的绝了", "绝绝子", "好用到哭"]
-        repeat_counts = [text.count(cp) for cp in catchphrases]
-        max_repeat = max(repeat_counts) if repeat_counts else 0
-        catchphrase_repeat = round(max_repeat / total_sentences, 3)
+                continue
+            if value <= 3 or int(value) in INTERACTION_SAFE_NUMBERS:
+                continue
+            hallucinated.append(number)
+        hallucination_rate = round(len(hallucinated) / max(len(output_numbers), 1), 3)
 
         return {
-            "interactive_density": interactive_density,
+            "interactive_sentence_ratio": interactive_ratio,
             "avg_sentence_len": avg_sentence_len,
             "spoken_ratio": spoken_ratio,
             "structure_completeness": structure_score,
-            "selling_point_coverage": selling_point_coverage,
+            "selling_point_coverage": selling_coverage,
             "hallucination_rate": hallucination_rate,
-            "emotion_progression": emotion_score,
-            "catchphrase_repeat": catchphrase_repeat,
+            "hallucinated_numbers": hallucinated,
+            "emotion_progression": self._emotion_progression_score(text),
+            "catchphrase_repeat": self._catchphrase_repeat(text, total_sentences),
             "sentence_count": total_sentences,
-            "char_count": total_chars
+            "char_count": total_chars,
         }
 
-    def _emotion_progression_score(self, text: str) -> float:
-        """检测情绪递进（0-5分）"""
-        sentences = self._split_sentences(text)
+    @staticmethod
+    def _catchphrase_repeat(text: str, total_sentences: int) -> float:
+        catchphrases = ["家人们", "我跟你说", "真的绝了", "绝绝子", "好用到哭"]
+        max_repeat = max((text.count(phrase) for phrase in catchphrases), default=0)
+        return round(max_repeat / max(total_sentences, 1), 3)
+
+    @staticmethod
+    def _emotion_progression_score(text: str) -> float:
+        sentences = LiveStreamEvaluator._split_sentences(text)
         if len(sentences) < 3:
-            return 2.0  # 句子太少，无法判断
-
-        # 给每个句子打情绪标签
-        emotion_seq = []
-        for sent in sentences:
-            has_calm = any(w in sent for w in EMOTION_WORDS["平静"])
-            has_excited = any(w in sent for w in EMOTION_WORDS["兴奋"])
-            has_urgent = any(w in sent for w in EMOTION_WORDS["急促"])
-
-            if has_urgent:
-                emotion_seq.append(2)  # 急促
-            elif has_excited:
-                emotion_seq.append(1)  # 兴奋
-            elif has_calm:
-                emotion_seq.append(0)  # 平静
-            else:
-                emotion_seq.append(-1)  # 无情绪
-
-        # 过滤掉无情绪的句子
-        valid_seq = [e for e in emotion_seq if e >= 0]
-        if len(valid_seq) < 3:
             return 2.0
 
-        # 计算递进得分
-        score = 0
-        for i in range(1, len(valid_seq)):
-            if valid_seq[i] >= valid_seq[i-1]:
-                score += 1  # 情绪递进或持平
+        sequence = []
+        for sentence in sentences:
+            if any(word in sentence for word in EMOTION_WORDS["急促"]):
+                sequence.append(2)
+            elif any(word in sentence for word in EMOTION_WORDS["兴奋"]):
+                sequence.append(1)
+            elif any(word in sentence for word in EMOTION_WORDS["平静"]):
+                sequence.append(0)
+            else:
+                sequence.append(-1)
 
-        # 归一化到 0-5
-        progression_ratio = score / max(len(valid_seq) - 1, 1)
-        return round(progression_ratio * 5, 1)
+        valid = [value for value in sequence if value >= 0]
+        if len(valid) < 3:
+            return 2.0
 
-    # ========== 软指标（LLM 裁判，结构化 prompt） ==========
+        increases = sum(1 for left, right in zip(valid, valid[1:]) if right > left)
+        decreases = sum(1 for left, right in zip(valid, valid[1:]) if right < left)
+        score = 2.0 + 1.2 * increases - 0.8 * decreases
+        if valid[0] == 0:
+            score += 0.2
+        if valid[-1] == 2:
+            score += 0.3
+        return round(min(5.0, max(0.0, score)), 1)
 
-    def soft_metrics_llm(self, text: str, model_path: str = None) -> Dict:
-        """
-        用本地模型做 LLM 裁判
-        如果无模型，返回模拟值
-        """
-        # 构造裁判 prompt
-        judge_prompt = f"""你是一个直播话术评估专家。请分析以下话术的流畅度。
-
-评估标准：
-1. 句子是否通顺，无语法错误
-2. 是否口语化，朗读是否流畅
-3. 有无生僻词或拗口表达
+    def soft_metrics_llm(self, text: str, model_path: str | None = None) -> Dict:
+        """Use a local MLX model as judge when requested; otherwise use rules."""
+        if model_path:
+            judge_prompt = f"""你是一个直播话术评估专家。请分析以下话术的流畅度。
 
 只输出 JSON，不要其他内容：
-{{
-  "fluency_score": 0-5的整数,
-  "fluency_reason": "一句话说明"
-}}
+{{"fluency_score": 0-5的整数, "fluency_reason": "一句话说明"}}
 
 【话术】{text}
 """
-        # 尝试用本地模型生成
-        if model_path:
             try:
                 result = subprocess.run(
                     [
@@ -316,344 +262,268 @@ class LiveStreamEvaluator:
                         "--model", model_path,
                         "--prompt", judge_prompt,
                         "--max-tokens", "100",
-                        "--temp", "0.1"
+                        "--temp", "0.1",
                     ],
                     capture_output=True,
                     text=True,
-                    timeout=60
+                    timeout=120,
                 )
-                output = result.stdout
-                # 提取 JSON
-                json_match = re.search(r'\{[^}]+\}', output)
-                if json_match:
-                    return json.loads(json_match.group())
-            except Exception as e:
+                match = re.search(r"\{[^}]+\}", result.stdout)
+                if match:
+                    payload = json.loads(match.group())
+                    payload["fluency_method"] = "llm"
+                    return payload
+            except Exception:
                 pass
 
-        # 如果无法调用模型，用规则估算流畅度
         return self._estimate_fluency(text)
 
-    def _estimate_fluency(self, text: str) -> Dict:
-        """用规则估算流畅度（适配数字人直播场景）"""
-        sentences = self._split_sentences(text)
-
-        # 数字人直播场景：句子长度可以更长（讲卖点时）
-        # 原来：>20字为长句 → 现在：>30字为长句
-        long_sentences = [s for s in sentences if len(s) > 30]
-
-        # 计算流畅度（0-5）
+    @staticmethod
+    def _estimate_fluency(text: str) -> Dict:
+        sentences = LiveStreamEvaluator._split_sentences(text)
         score = 5
-
-        # 规则1：长句过多（>30字的句子超过40%才扣分）
-        if len(long_sentences) > len(sentences) * 0.4:
-            score -= 1  # 长句过多
-
-        # 规则2：无标点片段（数字人直播场景放宽到25字）
-        if any(re.search(r'[一-鿿]{25,}', s) for s in sentences):
-            score -= 1  # 有超过25字无标点的片段
-
-        # 规则3：句子太少
-        if len(sentences) < 3:
-            score -= 1  # 句子太少
-
-        # 规则4：有结构化标签加分（数字人直播场景）
-        structure_labels = ["平静", "兴奋", "急促", "开场", "转折", "结尾"]
-        has_structure = any(label in text for label in structure_labels)
-        if has_structure:
-            score = min(score + 1, 5)  # 加分，但不超过5分
-
-        # 计算实际长句比例
+        long_sentences = [sentence for sentence in sentences if len(sentence) > 30]
         long_ratio = len(long_sentences) / max(len(sentences), 1)
+
+        if long_ratio > 0.4:
+            score -= 1
+        if any(len(sentence) > 50 for sentence in sentences):
+            score -= 1
+        if any(re.search(r"[\u4e00-\u9fff]{25,}", sentence) for sentence in sentences):
+            score -= 1
+        if len(sentences) < 3:
+            score -= 1
 
         return {
             "fluency_score": max(score, 1),
-            "fluency_reason": f"长句数: {len(long_sentences)}/{len(sentences)} ({long_ratio:.0%}), 有结构标签: {has_structure}"
+            "fluency_reason": f"长句数: {len(long_sentences)}/{len(sentences)} ({long_ratio:.0%})",
+            "fluency_method": "rule",
         }
 
-    # ========== 评估单个样本 ==========
-
-    def evaluate_single(self, text: str, prompt: str, model_path: str = None) -> Dict:
-        """评估单个样本"""
-        hard = self.hard_metrics(text, prompt)
-        soft = self.soft_metrics_llm(text, model_path)
-
-        return {**hard, **soft}
-
-    # ========== 评估整个模型 ==========
+    def evaluate_single(self, text: str, prompt: str, judge_model: str | None = None) -> Dict:
+        return {**self.hard_metrics(text, prompt), **self.soft_metrics_llm(text, judge_model)}
 
     def evaluate_model(
         self,
         generate_func,
         model_name: str = "model",
-        num_samples: int = None
+        num_samples: int | None = None,
+        model_path: str | None = None,
+        adapter_path: str | None = None,
+        judge_model: str | None = None,
+        generation_params: Dict | None = None,
     ) -> Dict:
-        """
-        评估整个模型
-
-        Args:
-            generate_func: 生成函数，输入 prompt，输出 text
-            model_name: 模型名称
-            num_samples: 评估样本数（None=全部）
-        """
-        results = []
         benchmark = self.benchmark[:num_samples] if num_samples else self.benchmark
-
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"开始评估: {model_name}")
-        print(f"测试集大小: {len(benchmark)} 条")
-        print(f"{'='*60}\n")
+        print(f"测试集大小: {len(benchmark)} 条 | metric={METRIC_VERSION} prompt={PROMPT_VERSION}")
+        print(f"{'=' * 60}\n")
 
-        for i, item in enumerate(benchmark):
+        results = []
+        for index, item in enumerate(benchmark, start=1):
             prompt = item["prompt"]
-            print(f"[{i+1}/{len(benchmark)}] {item['id']} - {item['category']}/{item['scene']}")
-
-            # 生成输出
+            print(f"[{index}/{len(benchmark)}] {item['id']} - {item['category']}/{item['scene']}")
             try:
                 output = generate_func(prompt)
-            except Exception as e:
-                print(f"  ❌ 生成失败: {e}")
+            except Exception as exc:
+                print(f"  ❌ 生成失败: {exc}")
                 output = ""
 
-            # 评估
-            metrics = self.evaluate_single(output, prompt)
-
+            metrics = self.evaluate_single(output, prompt, judge_model)
             results.append({
                 "benchmark_id": item["id"],
                 "category": item["category"],
                 "scene": item["scene"],
                 "prompt": prompt,
                 "output": output,
-                "metrics": metrics
+                "metrics": metrics,
             })
+            print(
+                f"  互动句占比: {metrics['interactive_sentence_ratio']:.2f} | "
+                f"句长: {metrics['avg_sentence_len']:.1f} | "
+                f"幻觉率: {metrics['hallucination_rate']:.2f} | "
+                f"结构: {metrics['structure_completeness']}/5"
+            )
 
-            print(f"  互动密度: {metrics['interactive_density']:.2f} | "
-                  f"句长: {metrics['avg_sentence_len']:.1f} | "
-                  f"口语占比: {metrics['spoken_ratio']:.3f} | "
-                  f"结构: {metrics['structure_completeness']}/5")
-
-        # 聚合所有样本
         aggregated = self._aggregate_metrics(results)
-
+        target_checks = {
+            key: _target_passes(key, aggregated[key]["mean"])
+            for key in TARGETS
+            if key in aggregated and "mean" in aggregated[key]
+        }
         return {
             "model_name": model_name,
             "timestamp": datetime.now().isoformat(),
+            "metric_version": METRIC_VERSION,
+            "prompt_version": PROMPT_VERSION,
+            "system_prompt": SYSTEM_PROMPT,
+            "model_path": model_path,
+            "adapter_path": adapter_path,
+            "judge_model": judge_model,
+            "generation_params": generation_params,
+            "git_commit": _git_commit(),
+            "git_dirty": _git_dirty(),
+            "evaluator_sha256": _evaluator_sha256(),
             "benchmark_size": len(benchmark),
+            "benchmark_sha256": _sha256_file(self.benchmark_path),
+            "targets": TARGETS,
+            "target_checks": target_checks,
             "sample_results": results,
-            "aggregated": aggregated
+            "aggregated": aggregated,
         }
 
     def _aggregate_metrics(self, results: List[Dict]) -> Dict:
-        """聚合所有样本的平均指标"""
-        all_metrics = [r["metrics"] for r in results]
-        all_keys = all_metrics[0].keys()
-
+        all_metrics = [result["metrics"] for result in results]
         aggregated = {}
-        for key in all_keys:
-            values = [m[key] for m in all_metrics]
-            # 只对数值类型计算统计量
+        for key in all_metrics[0].keys():
+            values = [metrics[key] for metrics in all_metrics]
             if isinstance(values[0], (int, float)):
                 aggregated[key] = {
                     "mean": round(float(np.mean(values)), 3),
                     "std": round(float(np.std(values)), 3),
                     "min": round(float(np.min(values)), 3),
-                    "max": round(float(np.max(values)), 3)
+                    "max": round(float(np.max(values)), 3),
                 }
-            else:
-                # 字符串类型只记录众数
-                from collections import Counter
-                most_common = Counter(values).most_common(1)[0][0]
-                aggregated[key] = {
-                    "mode": most_common,
-                    "unique_count": len(set(values))
-                }
-
+            elif isinstance(values[0], str):
+                mode = Counter(values).most_common(1)[0][0]
+                aggregated[key] = {"mode": mode, "unique_count": len(set(values))}
         return aggregated
 
-    # ========== 生成评估报告 ==========
-
-    def save_report(self, report: Dict, filename: str = None) -> str:
-        """保存评估报告"""
+    def save_report(self, report: Dict, filename: str | None = None) -> str:
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             model_name = report["model_name"].replace("/", "_")
-            filename = f"eval_{model_name}_{timestamp}.json"
-
+            filename = f"eval_v2_{model_name}_{timestamp}.json"
         filepath = EVAL_RESULTS_DIR / filename
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2, ensure_ascii=False)
-
+        with open(filepath, "w", encoding="utf-8") as handle:
+            json.dump(report, handle, indent=2, ensure_ascii=False)
         print(f"\n✅ 报告已保存: {filepath}")
         return str(filepath)
 
     def print_comparison(self, reports: List[Dict]) -> str:
-        """打印多模型对比报告"""
         if len(reports) < 2:
             print("需要至少 2 个报告才能对比")
             return ""
 
-        # 定义指标显示名称和目标值
-        metric_config = {
-            "interactive_density": {"name": "互动密度(句)", "target": "0.2-0.25", "higher_better": True},
-            "avg_sentence_len": {"name": "平均句长(字)", "target": "15-20", "higher_better": False},
-            "spoken_ratio": {"name": "口语词占比", "target": ">0.02", "higher_better": True},
-            "structure_completeness": {"name": "结构完整度(0-5)", "target": ">4.5", "higher_better": True},
-            "selling_point_coverage": {"name": "卖点覆盖率", "target": ">0.8", "higher_better": True},
-            "hallucination_rate": {"name": "幻觉率", "target": "<0.05", "higher_better": False},
-            "emotion_progression": {"name": "情绪递进得分", "target": ">3.5", "higher_better": True},
-            "fluency_score": {"name": "流畅度得分", "target": ">3.5", "higher_better": True}
-        }
+        versions = {report.get("metric_version", "v1") for report in reports}
+        if versions != {METRIC_VERSION}:
+            print(
+                f"⚠️ 报告指标版本为 {sorted(versions)}，不是当前 {METRIC_VERSION}；"
+                "以下对比仅供排查，不能作为结论。"
+            )
 
-        # 构建表格
         header = f"{'指标':<20} |"
         for report in reports:
-            name = report["model_name"][:15]
-            header += f" {name:^15} |"
-        header += f" {'目标值':^10} |"
-        header += "\n" + "-" * len(header)
+            header += f" {report['model_name'][:15]:^15} |"
+        header += f" {'目标':^12} |"
+        rows = [header, "-" * len(header)]
 
-        rows = [header]
-        for key, config in metric_config.items():
-            row = f"{config['name']:<20} |"
-            values = []
+        for key, spec in TARGETS.items():
+            row = f"{spec['label']:<20} |"
             for report in reports:
-                val = report["aggregated"][key]["mean"]
-                values.append(val)
-                row += f" {val:^15.3f} |"
-
-            # 添加变化箭头
-            if len(values) >= 2:
-                delta = values[-1] - values[-2]
-                arrow = "↑" if delta > 0 else "↓" if delta < 0 else "="
-            else:
-                arrow = ""
-
-            row += f" {config['target']:^10} {arrow}"
+                aggregated = report.get("aggregated", {})
+                value = aggregated.get(key, {}).get("mean")
+                if value is None and key == "interactive_sentence_ratio":
+                    value = aggregated.get("interactive_density", {}).get("mean")
+                row += f" {value if value is not None else 'N/A':^15} |"
+            target = f">={spec['lower']}" if "lower" in spec else f"<={spec['upper']}"
+            if "lower" in spec and "upper" in spec:
+                target = f"{spec['lower']}-{spec['upper']}"
+            row += f" {target:^12} |"
             rows.append(row)
 
         table = "\n".join(rows)
-
-        # 打印
-        print(f"\n{'='*80}")
-        print("模型迭代评估报告")
-        print(f"Benchmark: {reports[0]['benchmark_size']}条固定测试集")
-        print(f"评估时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-        print(f"{'='*80}\n")
         print(table)
-
-        # 关键发现
-        print(f"\n{'='*80}")
-        print("关键发现:")
-        print(f"{'='*80}")
-
-        base = reports[0]["aggregated"]
-        latest = reports[-1]["aggregated"]
-
-        improvements = []
-        degradations = []
-
-        for key, config in metric_config.items():
-            base_val = base[key]["mean"]
-            latest_val = latest[key]["mean"]
-            delta = latest_val - base_val
-
-            if config["higher_better"] and delta > 0.1:
-                improvements.append((config["name"], delta))
-            elif not config["higher_better"] and delta < -0.01:
-                improvements.append((config["name"], -delta))
-            elif config["higher_better"] and delta < -0.1:
-                degradations.append((config["name"], delta))
-            elif not config["higher_better"] and delta > 0.01:
-                degradations.append((config["name"], delta))
-
-        for name, delta in improvements:
-            print(f"✅ {name}: 提升 {delta:.3f}")
-        for name, delta in degradations:
-            print(f"⚠️ {name}: 下降 {abs(delta):.3f}")
-
         return table
 
 
-# ========== 使用示例 ==========
+def create_mlx_generator(
+    model_path: str,
+    adapter_path: str | None = None,
+    temp: float = 0.7,
+    top_p: float = 0.9,
+    max_tokens: int = 300,
+):
+    """Load an MLX model once and return a prompt -> text function."""
+    from mlx_lm import generate, load
+    from mlx_lm.sample_utils import make_sampler
 
-def create_mlx_generator(model_path: str, adapter_path: str = None, temp: float = 0.7):
-    """创建 MLX 生成函数"""
-    # System prompt（与训练数据一致）
-    SYSTEM_PROMPT = """你是一位抖音直播带货话术专家。你的风格特征：
-①短句为主，每句不超过15字
-②每3句话插入一次互动指令（"扣1"、"对不对"、"听我说"）
-③先讲痛点场景，再给解决方案，最后价格逼单
-④情绪递进：平静→兴奋→急促
-⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有
-⑥数字要具体：价格、数量、时间都要明确说出"""
+    model, tokenizer = load(model_path, adapter_path=adapter_path)
+    sampler = make_sampler(temp=temp, top_p=top_p)
 
-    def generate(prompt: str) -> str:
-        # 构造完整的 prompt（包含 system prompt）
+    def generate_text(prompt: str) -> str:
         full_prompt = f"{SYSTEM_PROMPT}\n\n用户：{prompt}\n助手："
+        return generate(
+            model,
+            tokenizer,
+            prompt=full_prompt,
+            max_tokens=max_tokens,
+            sampler=sampler,
+            verbose=False,
+        ).strip()
 
-        cmd = [
-            sys.executable, "-m", "mlx_lm", "generate",
-            "--model", model_path,
-            "--prompt", full_prompt,
-            "--max-tokens", "300",
-            "--temp", str(temp)
-        ]
-        if adapter_path:
-            cmd.extend(["--adapter-path", adapter_path])
-
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        # 提取生成内容（去掉元数据）
-        output = result.stdout
-        # 找到 ========== 之间的内容
-        match = re.search(r'==========\n(.*?)\n==========', output, re.DOTALL)
-        if match:
-            return match.group(1).strip()
-        return output.strip()
-
-    return generate
+    return generate_text
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="直播话术评估体系")
+def main() -> int:
+    parser = argparse.ArgumentParser(description="直播话术评估体系 v2")
     parser.add_argument("--model", help="基座模型路径")
     parser.add_argument("--adapter", help="LoRA adapter 路径")
     parser.add_argument("--name", default="model", help="模型名称")
-    parser.add_argument("--samples", type=int, help="评估样本数（默认全部30条）")
+    parser.add_argument("--samples", type=int, help="评估样本数（默认全部 30 条）")
     parser.add_argument("--save", action="store_true", help="保存报告到文件")
     parser.add_argument("--compare", nargs="+", help="对比多个报告文件")
-
+    parser.add_argument("--judge-model", help="可选：本地模型路径，用于 LLM 流畅度裁判")
+    parser.add_argument("--max-tokens", type=int, default=300)
+    parser.add_argument("--temp", type=float, default=0.7)
+    parser.add_argument("--top-p", type=float, default=0.9)
     args = parser.parse_args()
 
     evaluator = LiveStreamEvaluator()
-
     if args.compare:
-        # 对比模式
         reports = []
         for filepath in args.compare:
-            with open(filepath) as f:
-                reports.append(json.load(f))
+            with open(filepath, encoding="utf-8") as handle:
+                reports.append(json.load(handle))
         evaluator.print_comparison(reports)
-    else:
-        # 评估模式
-        generate_func = create_mlx_generator(args.model, args.adapter)
+        return 0
 
-        report = evaluator.evaluate_model(
-            generate_func,
-            model_name=args.name,
-            num_samples=args.samples
-        )
+    if not args.model:
+        parser.error("--model is required unless --compare is used")
 
-        # 打印结果
-        print(f"\n{'='*60}")
-        print("评估完成!")
-        print(f"{'='*60}")
-        for key, val in report["aggregated"].items():
-            if key not in ["sentence_count", "char_count"]:
-                if "mean" in val:
-                    print(f"{key}: {val['mean']:.3f} (±{val.get('std', 0):.3f})")
-                else:
-                    print(f"{key}: {val.get('mode', 'N/A')}")
+    generate_func = create_mlx_generator(
+        args.model,
+        adapter_path=args.adapter,
+        temp=args.temp,
+        top_p=args.top_p,
+        max_tokens=args.max_tokens,
+    )
+    report = evaluator.evaluate_model(
+        generate_func,
+        model_name=args.name,
+        num_samples=args.samples,
+        model_path=args.model,
+        adapter_path=args.adapter,
+        judge_model=args.judge_model,
+        generation_params={"max_tokens": args.max_tokens, "temp": args.temp, "top_p": args.top_p},
+    )
 
-        if args.save:
-            evaluator.save_report(report)
+    print(f"\n{'=' * 60}")
+    print("评估完成")
+    print(f"{'=' * 60}")
+    for key, spec in TARGETS.items():
+        aggregated = report["aggregated"].get(key)
+        if not aggregated or "mean" not in aggregated:
+            continue
+        status = "PASS" if report["target_checks"].get(key) else "FAIL"
+        print(f"{spec['label']}: {aggregated['mean']:.3f} [{status}]")
+    passed = sum(report["target_checks"].values())
+    print(f"targets: {passed}/{len(report['target_checks'])}")
+
+    if args.save:
+        evaluator.save_report(report)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

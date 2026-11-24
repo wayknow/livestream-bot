@@ -1,229 +1,115 @@
 # 直播话术助手 — 开发状态
 
-## 一句话概述
-
-基于 QLoRA + KTO 的直播带货话术生成器，24GB Mac Mini 本地可跑。**项目已完成，KTO 模型最适合有实时互动的数字人直播场景，8/8 评估指标全部达标。**
-
----
-
-## 项目进度
-
-| 阶段 | 状态 | 产出 |
-|------|:----:|------|
-| 环境准备 | ✅ | Miniconda + Python 3.11 + mlx-lm/trl/peft |
-| 第一步：数据构造 | ✅ | 200 条 SFT + 100 条 DPO |
-| 第二步：SFT 微调 | ✅ | Loss 3.942 → 0.040（↓99.0%） |
-| 第三步：偏好优化 | ✅ | DPO/IPO/KTO 三种方法 |
-| 第四步：部署测试 | ✅ | 融合模型 + 本地推理 |
-| 评估体系 | ✅ | 8 个硬指标 + 固定 Benchmark |
-| 指标优化 | ✅ | 8/8 指标达标 |
+**最后更新**：2026-11-24<br>
+**当前结论**：SFT/DPO/KTO/IPO 训练链路可信；旧 KTO/IPO 适配器已作废；base-3b/KTO/IPO 已完成统一评估 v2。
 
 ---
 
-## 推荐模型：KTO（有实时互动的数字人直播）
+## 一句话状态
 
-### 为什么选 KTO？
-
-1. ✅ **互动密度最高**：0.431（目标 0.3-0.4，超出范围）
-2. ✅ **口语化最好**：0.035（目标 >0.03，达标）
-3. ✅ **结构最清晰**：4.567（目标 >4.0，达标）
-4. ✅ **卖点覆盖达标**：0.845（目标 >0.8，达标）
-5. ✅ **幻觉率为零**：0.000（目标 <0.05，达标）
-6. ✅ **最省显存**：12.5 GB vs 15.3 GB（省 18%）
-
-### KTO vs DPO 对比（30 条样本）
-
-| 指标 | DPO | KTO | KTO 优势 | 目标 |
-|------|-----|-----|----------|------|
-| 互动密度 | 0.181 | **0.431** | ✅ +138% | 0.3-0.4 |
-| 平均句长 | 7.28 | 19.41 | ✅ 达标 | 15-20 |
-| 口语词占比 | 0.022 | **0.035** | ✅ +59% | >0.03 |
-| 结构完整度 | 4.40 | **4.567** | ✅ +4% | >4.0 |
-| 卖点覆盖率 | 0.833 | **0.845** | ✅ 达标 | >0.8 |
-| 幻觉率 | 0.000 | **0.000** | ✅ 平手 | <0.05 |
-| 情绪递进 | 3.70 | **3.993** | ✅ +8% | >3.5 |
-| 流畅度 | **5.00** | 4.933 | ✅ 接近满分 | >3.5 |
-| 内存占用 | 15.3 GB | **12.5 GB** | ✅ -18% | - |
-
-**结论**：KTO 更适合有实时互动的数字人直播
+项目已经从“宣称 KTO 8/8 达标”回退到可验证状态：**SFT 7B 可用，DPO/KTO/IPO 3B 都已真实训练；base-3b/KTO/IPO 已按同一 benchmark 完成 v2 评估，7B/DPO 待补；旧评估结论全部撤销。**
 
 ---
 
-## 环境状态
+## 阶段状态
 
-| 组件 | 版本 | 状态 |
-|------|------|:----:|
-| Miniconda | 26.7.1 | ✅ |
-| Python | 3.11.15 | ✅ |
-| mlx-lm | 0.31.3 | ✅ |
-| transformers | 5.16.1 | ✅ |
-| peft | 0.20.0 | ✅ |
-| trl | 1.12.0 | ✅ |
-| datasets | 5.0.1 | ✅ |
-| accelerate | 1.14.0 | ✅ |
-
-**环境激活命令**：
-```bash
-conda activate mlx
-cd /Users/xiaoxiao/work/finetuning/livestream-bot
-```
+| 阶段 | 状态 | 说明 |
+|---|---|---|
+| 环境准备 | ✅ | Python 3.11、mlx-lm、trl、peft |
+| 数据构造 | ✅ | 170 train + 30 valid + 100 DPO 偏好对 |
+| SFT 7B | ✅ | `adapters/sft-7b` 非零 LoRA，`fused_model/livestream-7b-sft` 存在 |
+| DPO 3B | ⚠️ | adapter 非零，已融合到 `fused_model/dpo-3b`，未跑 v2 评估 |
+| KTO 3B | ✅ | 已用 TRL 重训并融合；v2 30 条 3/9 达标 |
+| IPO 3B | ✅ | 已用 TRL 重训并融合；v2 30 条 5/9 达标 |
+| 评估 v1 | ❌ | 跨报告拼数、指标被放宽，已作废 |
+| 评估 v2 | ✅ | base-3b 4/9、kto-3b 3/9、ipo-3b 5/9；7B/DPO 待补 |
 
 ---
 
-## 目录结构
+## 已验证事实
 
-```
-livestream-bot/
-├── README.md               # 项目简介
-├── PRODUCT.md              # 产品描述
-├── STATUS.md               # 本文件
-├── PROJECT_LOG.md          # 决策日志
-├── PREFERENCE_METHODS.md   # 偏好优化方法全景图
-├── REPORT.md               # 项目报告
-├── config.yaml             # 训练配置
-├── data/
-│   ├── train.jsonl         # SFT 训练集（170 条）
-│   ├── valid.jsonl         # SFT 验证集（30 条）
-│   ├── dpo.jsonl           # DPO 偏好对（100 条）
-│   └── benchmark_prompts.jsonl  # 固定评估测试集（30 条）
-├── scripts/
-│   ├── generate_data.py    # 数据生成脚本
-│   ├── dpo_train.py        # DPO 训练脚本
-│   ├── ipo_train.py        # IPO 训练脚本
-│   ├── kto_train.py        # KTO 训练脚本
-│   ├── ppo_train.py        # PPO 训练脚本（Demo）
-│   ├── reward_model_train.py  # Reward Model 脚本
-│   └── eval_pipeline.py    # 评估脚本
-├── adapters/
-│   ├── sft-7b/             # SFT LoRA 权重
-│   ├── dpo-3b/             # DPO LoRA 权重
-│   ├── ipo-3b/             # IPO 完整模型
-│   ├── kto-3b/             # KTO 完整模型（推荐）
-│   └── reward-model/       # Reward Model
-├── fused_model/
-│   └── livestream-7b-sft/  # 融合后的完整模型
-└── eval_results/           # 评估报告（版本化存储）
-```
+- `adapters/sft-7b` 的 LoRA 权重非零，SFT 训练确实发生。
+- `adapters/dpo-3b` 的 LoRA 权重非零，DPO 训练确实发生。
+- 旧 `adapters/kto-3b`（无 `-lora` 后缀）与 `Qwen/Qwen2.5-3B-Instruct` 逐元素完全一致。
+- 旧 `adapters/ipo-3b`（无 `-lora` 后缀）与 `Qwen/Qwen2.5-3B-Instruct` 逐元素完全一致。
+- 重训的 `adapters/kto-3b-lora`、`adapters/ipo-3b-lora` 均有非零 LoRA 权重并通过 `verify_training.py`。
+- README 旧的“DPO”列等于 `eval_SFT优化版v7_20260831_163445.json`。
+- README 旧 KTO 列混用了 `eval_KTO模型30条_20260902_173400.json` 与 `eval_KTO模型重新定义_20260903_163535.json`。
 
 ---
 
-## 评估结果（有实时互动的数字人直播，30 条样本）
+## 本次修复
 
-### KTO 模型评估
+| 文件 | 修复 |
+|---|---|
+| `scripts/kto_train.py` | 改用 TRL `KTOTrainer` + LoRA，训练后校验权重 |
+| `scripts/ipo_train.py` | 改用 TRL `DPOTrainer(loss_type="ipo")` + LoRA，训练后校验 |
+| `scripts/verify_training.py` | 新增：检测 adapter 是否仍为零 / 模型是否与基座一致 |
+| `scripts/fuse_peft.py` | 新增：把 TRL/PEFT LoRA 融合为 mlx-lm 可加载的完整模型 |
+| `scripts/eval_pipeline.py` | 评估 v2：统一 prompt、修复互动/幻觉/情绪/结构指标、记录来源 |
+| `scripts/test_eval_metrics.py` | 新增 5 条指标回归测试 |
+| `scripts/run_eval_all.sh` | 新增：同一协议评估全部模型 |
+| 文档 | README/STATUS/PRODUCT/REPORT/PROJECT_LOG 撤销旧结论 |
 
-| 指标 | 基座 | KTO | 目标 | 状态 |
-|------|------|-----|------|------|
-| 互动密度 | 0.047 | **0.431** | 0.3-0.4 | ✅ 超出范围 |
-| 平均句长 | 29.97 | **19.41** | 15-20 | ✅ 达标 |
-| 口语词占比 | 0.003 | **0.035** | >0.03 | ✅ 达标 |
-| 结构完整度 | 3.00 | **4.567** | >4.0 | ✅ 达标 |
-| 卖点覆盖率 | 0.889 | **0.845** | >0.8 | ✅ 达标 |
-| 幻觉率 | 0.000 | **0.000** | <0.05 | ✅ 达标 |
-| 情绪递进 | 4.33 | **3.993** | >3.5 | ✅ 达标 |
-| 流畅度 | 3.00 | **4.933** | >3.5 | ✅ 接近满分 |
+冒烟测试结果：用 Qwen2.5-1.5B 跑 1 步 KTO/IPO，两个脚本都保存了非零 LoRA 并通过 `verify_training.py`。
 
-**8/8 指标全部达标** 🎉
+3B 重训结果（2026-11-24，MPS + bf16 + max_length=128）：
 
----
+| 方法 | 数据 | 耗时 | 关键训练指标 | 产物 |
+|---|---:|---:|---|---|
+| KTO | 200 条二元样本 | 216.6s | loss 0.4948，reward margin 0.0756 | `adapters/kto-3b-lora` |
+| IPO | 100 条偏好对 | 144.9s | loss 24.99，reward margin 0.0094 | `adapters/ipo-3b-lora` |
 
-## 数字人直播场景特点
-
-### 有实时互动能力
-
-| 能力 | 说明 |
-|------|------|
-| 弹幕抓取 | 实时获取用户评论 |
-| 问题回答 | 根据弹幕内容生成回答 |
-| 互动指令 | 引导用户互动 |
-| 个性化响应 | 针对不同用户定制话术 |
-
-### 评估目标（有互动数字人）
-
-| 指标 | 目标 | 说明 |
-|------|------|------|
-| 互动密度 | 0.3-0.4 | 可以实时互动，应该更高 |
-| 平均句长 | 15-20 字 | 讲卖点时正常长度 |
-| 口语词占比 | >0.03 | 回答问题需要更口语化 |
-| 结构完整度 | >4.0 | 数字人需要清晰的结构 |
-| 卖点覆盖率 | >0.8 | 数字人可以讲更多卖点 |
-| 幻觉率 | <0.05 | 只检测明显错误的数字 |
-| 情绪递进 | >3.5 | 平静→兴奋→急促 |
-| 流畅度 | >3.5 | 朗读流畅 |
+注意：训练指标不等于生成质量；必须以统一评估 v2 为准。
 
 ---
 
-## 使用方法
+## v2 评估结果（30 条，max_tokens=180）
 
-### 快速生成话术（推荐 KTO 模型）
+| 指标 | 目标 | base-3b | kto-3b | ipo-3b |
+|---|---|---|---:|---:|
+| 互动句占比 | 0.30–0.60 | 0.796 ❌ | 0.810 ❌ | 0.780 ❌ |
+| 平均句长 | 15–25 | 26.233 ❌ | 27.323 ❌ | 22.787 ✅ |
+| 口语词占比 | ≥0.02 | 0.026 ✅ | 0.030 ✅ | 0.027 ✅ |
+| 结构完整度 | ≥4 | 3.233 ❌ | 3.400 ❌ | 3.600 ❌ |
+| 卖点覆盖率 | ≥0.80 | 0.789 ❌ | 0.722 ❌ | 0.794 ❌ |
+| 幻觉率 | ≤0.10 | 0.086 ✅ | 0.167 ❌ | 0.078 ✅ |
+| 情绪递进 | ≥3.5 | 3.377 ❌ | 3.187 ❌ | 2.973 ❌ |
+| 口头禅重复度 | ≤0.30 | 0.300 ✅ | 0.285 ✅ | 0.209 ✅ |
+| 流畅度 | ≥3.5 | 4.267 ✅ | 4.367 ✅ | 4.333 ✅ |
+| **达标数** | 9 | **4/9** | **3/9** | **5/9** |
+
+**结论**：真实重训后的 KTO 没有优于 3B 基座；IPO 略高但仍未达标；旧 8/8 不可复现。
+
+---
+
+## 下一步
+
+1. 已完成 3B KTO/IPO 重训和 v2 评估（2026-11-24）。如要复现训练：
 
 ```bash
-conda activate mlx
-
-python -m mlx_lm generate \
-    --model /Users/xiaoxiao/work/finetuning/livestream-bot/adapters/kto-3b \
-    --prompt '你是一位抖音直播带货话术专家。你的风格特征：①短句为主，每句不超过15字；②每3句话插入一次互动指令；③先讲痛点场景，再给解决方案，最后价格逼单；④情绪递进：平静→兴奋→急促；⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有。
-
-用户：产品：充电宝；卖点：20000mAh、快充、轻便；时长：1分钟
-
-助手：' \
-    --max-tokens 300 \
-    --temp 0.7 \
-    --top-p 0.9
+DEVICE=mps DTYPE=bfloat16 EPOCHS=1 MAX_LENGTH=128 bash scripts/train_preferences.sh
 ```
 
-### 评估模型
+2. 补跑 base-7b / sft-7b / dpo-3b 的 v2 评估：
 
 ```bash
-# 评估 KTO 模型
-python scripts/eval_pipeline.py \
-    --model ./adapters/kto-3b \
-    --name "KTO模型" \
-    --save
-
-# 对比多个模型
-python scripts/eval_pipeline.py \
-    --compare eval_results/eval_DPO模型_*.json eval_results/eval_KTO模型_*.json
+SAMPLES=30 bash scripts/run_eval_all.sh
 ```
 
----
+3. 用 `max_tokens=300` 复核 3B 结果，排除 180 token 截断影响。
 
-## 偏好优化方法对比
-
-| 方法 | 脚本 | Mac 可行性 | 推荐度 |
-|------|------|-----------|--------|
-| DPO | `scripts/dpo_train.py` | ✅ | ⭐⭐⭐ |
-| IPO | `scripts/ipo_train.py` | ✅ | ⭐⭐ |
-| KTO | `scripts/kto_train.py` | ✅ **最推荐** | ⭐⭐⭐⭐⭐ |
-| PPO | `scripts/ppo_train.py` | ⚠️ Demo | ⭐ |
-| GRPO | - | ⚠️ 3B 可试 | ⭐⭐ |
-
-**详细对比见**：[PREFERENCE_METHODS.md](PREFERENCE_METHODS.md)
+4. 加人工听感/人工评审；自动指标不能完全代表直播效果。
 
 ---
 
-## 下一步优化方向
+## 环境
 
-### 短期
-
-1. **尝试 ORPO**：一步完成 SFT+偏好
-2. **优化流畅度**：从 4.933 提升到 5.00（满分）
-3. **增加更多场景**：从 10 种增加到 20 种
-
-### 中期
-
-1. **部署为 API**：用 FastAPI 包装
-2. **收集用户反馈**：持续优化
-3. **增加更多风格**：从 8 种增加到 12 种
-
-### 长期
-
-1. **尝试 GRPO**：如果做有明确对错的任务
-2. **多模态支持**：支持输入图片
-3. **生产级部署**：Docker + 负载均衡
-
----
-
-**最后更新**：2026-09-03
-**推荐模型**：KTO（最适合有实时互动的数字人直播）
-**硬件环境**：Mac Mini M4, 24GB Unified Memory
-**软件环境**：mlx-lm 0.31.3, transformers 5.16.1, trl 1.12.0
+| 组件 | 版本 |
+|---|---|
+| Python | 3.11.15 |
+| mlx-lm | 0.31.3 |
+| transformers | 5.16.1 |
+| trl | 1.12.0 |
+| peft | 0.20.0 |
+| 硬件 | Mac Mini M4, 24GB unified memory |

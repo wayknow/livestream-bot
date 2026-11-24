@@ -3,6 +3,8 @@
 > 本地微调实战总结（基于之前数字人直播和文案风格微调经验）
 > 硬件：Mac Mini M4, 24GB Unified Memory
 
+> **审计提示（2026-11-24）**：本报告记录的是 2026-08-28 的 SFT/DPO 阶段，保留为历史材料。后续文档里的 KTO 8/8 结论已撤销；旧 KTO/IPO 训练未生效。当前状态和证据见 [AUDIT.md](AUDIT.md)、[STATUS.md](STATUS.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
+
 ---
 
 ## 一、项目概述
@@ -188,7 +190,7 @@ livestream-bot/
 
 ## 八、结论
 
-**24GB Mac Mini 完全足够跑通"数据构造 → SFT → DPO → 部署"的完整闭环。**
+**24GB Mac Mini 足够跑通“数据构造 → SFT → DPO → 部署”的完整闭环。**
 
 这个流程和在 A100 上训 70B 模型的流程是一模一样的，只是模型小了点。先把这套功夫练熟，以后换大机器只是放大参数。
 
@@ -203,3 +205,30 @@ livestream-bot/
 **报告完成时间**：2026-08-28
 **硬件环境**：Mac Mini M4, 24GB Unified Memory
 **软件环境**：mlx-lm 0.31.3, transformers 5.16.1, trl 1.12.0
+
+---
+
+## 九、2026-11-24 审计更新
+
+本次审计推翻了后续文档中的“KTO 8/8 达标”结论：
+
+- 旧 `adapters/kto-3b`、`adapters/ipo-3b` 与 Qwen2.5-3B-Instruct 基座逐元素一致，训练没有更新权重。
+- 旧 KTO 指标来自多份评估报告拼接，README 的“DPO”列实际来自 SFT v7 报告。
+- 旧幻觉率被重定义为只检测负数/超大数字；旧“LLM 裁判”实际是规则评分。
+
+已完成的修复：
+
+- `scripts/kto_train.py` 改用 TRL `KTOTrainer`，`scripts/ipo_train.py` 改用 TRL `DPOTrainer(loss_type="ipo")`。
+- 新增 `scripts/verify_training.py`，训练后 LoRA 权重仍为零会直接失败。
+- `scripts/eval_pipeline.py` 升级到协议 v2，报告携带指标版本、prompt 版本、git commit 和 benchmark 哈希。
+- 文档撤销旧结论，旧评估报告标记为不可用。
+
+2026-11-24 的 v2 结果（30 条，`max_tokens=180`）：
+
+| 模型 | 目标命中 | 关键问题 |
+|---|---:|---|
+| base-3b | 4/9 | 互动过多、句长偏长、结构/卖点/情绪不达标 |
+| kto-3b | 3/9 | 幻觉率 0.167、卖点覆盖 0.722，未优于基座 |
+| ipo-3b | 5/9 | 结构 3.6、情绪 2.973，仍未达标 |
+
+当前可信结论：SFT 7B、DPO 3B、KTO 3B、IPO 3B 均已真实训练；真实重训后的 KTO 没有优于 3B 基座，IPO 略高但仍未达标。旧 8/8 不可复现。详细数据见 `eval_results/V2_RESULTS.md`。

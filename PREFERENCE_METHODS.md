@@ -2,6 +2,8 @@
 
 > 基于之前数字人直播和文案风格微调经验，整理偏好优化方法对比。
 
+> **2026-11-24 审计提示**：本文是方法科普，不是本项目实测结论。旧 KTO/IPO 脚本训练未生效，旧“KTO 最推荐”评估已撤销。重写后的脚本见 `scripts/kto_train.py`、`scripts/ipo_train.py`，证据见 [AUDIT.md](AUDIT.md)。
+
 ---
 
 ## 一、偏好优化方法分类
@@ -108,7 +110,7 @@
 - 适合有大量"单条标注"数据的场景
 
 **适用场景**：资源有限，只有二元好/坏标签。
-**Mac Mini**：✅ **最推荐**，7B QLoRA 非常舒服。
+**Mac Mini**：✅ 方法本身可行；本项目旧实现无效，已改用 TRL `KTOTrainer` 重训 3B，但 v2 评估只有 3/9 达标，未优于 3B 基座。
 
 ---
 
@@ -146,7 +148,7 @@
 | **GRPO** | ⚠️ | ✅ | 在线 | 🟠 高（3个模型+组采样） | 中 | 数学/代码推理 | ⚠️ 3B可试 |
 | **DPO** | ❌ | ✅ | 离线 | 🟡 中（2个模型） | 好 | 通用偏好对齐 | ✅ 7B QLoRA |
 | **IPO** | ❌ | ✅ | 离线 | 🟡 中 | 更好 | DPO训崩时 | ✅ 7B QLoRA |
-| **KTO** | ❌ | ❌ | 离线 | 🟢 低（1个模型） | 好 | 大量二元标注数据 | ✅ **最推荐** |
+| **KTO** | ❌ | ✅（TRL 实现） | 离线 | 🟢 低 | 好 | 大量二元标注数据 | 🛠 待重新验证 |
 | **ORPO** | ❌ | ❌ | 离线 | 🟢 低（1个模型） | 中 | 快速一步训练 | ✅ 推荐 |
 | **SimPO** | ❌ | ❌ | 离线 | 🟢 低 | 好 | 解决DPO长度偏差 | ✅ |
 
@@ -199,12 +201,12 @@
 
 | 方法 | 脚本 | 状态 | 结果 |
 |------|------|------|------|
-| DPO | `scripts/dpo_train.py` | ✅ | rewards/margins ↑ 9倍 |
-| IPO | `scripts/ipo_train.py` | ✅ | Accuracy 23%，更稳定 |
-| KTO | `scripts/kto_train.py` | ✅ | Neg Accuracy 100%，最省显存 |
+| DPO | `scripts/dpo_train.py` | ✅ | rewards/margins ↑ 9倍（训练指标，未统一评估） |
+| IPO | `scripts/ipo_train.py` | ✅ | 已改为 TRL 并重训 3B；v2 30 条 5/9 达标 |
+| KTO | `scripts/kto_train.py` | ✅ | 已改为 TRL 并重训 3B；v2 30 条 3/9 达标 |
 | RLHF Demo | `scripts/ppo_train.py` | ✅ | 简化版 Demo |
 
 ---
 
-**最后更新**：2026-08-31
-**项目状态**：已实现 DPO、IPO、KTO 三种偏好优化方法
+**最后更新**：2026-11-24
+**项目状态**：DPO/KTO/IPO 均已训练；3B KTO/IPO 已完成 v2 评估，KTO 未优于基座

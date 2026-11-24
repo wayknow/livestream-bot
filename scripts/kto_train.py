@@ -1,168 +1,201 @@
 #!/usr/bin/env python3
-"""
-KTO（Kahneman-Tversky Optimization）训练脚本
-不需要成对数据，只需要二元标签（好/坏）
-Mac 最友好：只需加载一个模型
+"""KTO training with TRL's real KTOTrainer.
+
+The previous implementation computed log-probabilities under ``torch.no_grad()``
+and wrapped the resulting float in a new tensor, so the optimizer never updated
+the model. This version uses TRL's KTOTrainer with LoRA, which requires a
+reference policy by construction and back-propagates through the policy.
 """
 
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from __future__ import annotations
+
+import argparse
+import hashlib
 import json
 import os
+import sys
+from pathlib import Path
 
-# 配置
-model_name = "Qwen/Qwen2.5-3B-Instruct"
-output_dir = "./adapters/kto-3b"
-data_file = "./data/dpo.jsonl"  # 复用 DPO 数据，转换为 KTO 格式
+import torch
+from datasets import Dataset
+from peft import LoraConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from trl import KTOConfig, KTOTrainer
 
-print("=" * 50)
-print("KTO 训练（Mac 最友好）")
-print("=" * 50)
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from verify_training import _adapter_stats  # noqa: E402
 
-# 1. 加载模型
-print(f"\n[1/3] 加载模型：{model_name}")
-tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-if tokenizer.pad_token is None:
-    tokenizer.pad_token = tokenizer.eos_token
 
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    dtype=torch.float32,
-    device_map="cpu",
-    trust_remote_code=True
-)
-print(f"  模型参数：{model.num_parameters()/1e9:.2f}B")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="KTO preference training (TRL)")
+    parser.add_argument("--model", default="Qwen/Qwen2.5-3B-Instruct")
+    parser.add_argument("--data", default=str(ROOT / "data" / "dpo.jsonl"))
+    parser.add_argument("--output", default=str(ROOT / "adapters" / "kto-3b-lora"))
+    parser.add_argument("--epochs", type=float, default=1.0)
+    parser.add_argument("--max-steps", type=int, default=-1)
+    parser.add_argument("--batch-size", type=int, default=2)
+    parser.add_argument("--grad-accum", type=int, default=2)
+    parser.add_argument("--learning-rate", type=float, default=5e-6)
+    parser.add_argument("--max-length", type=int, default=512)
+    parser.add_argument("--beta", type=float, default=0.1)
+    parser.add_argument("--dtype", choices=["float32", "bfloat16"], default="float32")
+    parser.add_argument("--device", choices=["auto", "cpu", "mps"], default="auto")
+    parser.add_argument("--limit", type=int, help="Limit number of preference pairs (debug/smoke)")
+    parser.add_argument("--save-steps", type=int, default=100)
+    parser.add_argument("--no-verify", action="store_true")
+    return parser.parse_args()
 
-# 2. 加载并转换数据
-print(f"\n[2/3] 加载并转换数据")
 
-# 读取 DPO 数据，转换为 KTO 格式
-# KTO 格式：{prompt, completion, label: true/false}
-with open(data_file, 'r', encoding='utf-8') as f:
-    dpo_data = [json.loads(line) for line in f if line.strip()]
+def load_kto_dataset(path: str, limit: int | None = None) -> Dataset:
+    rows = []
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            item = json.loads(line)
+            if limit and len(rows) >= limit * 2:
+                break
+            rows.append({"prompt": item["prompt"], "completion": item["chosen"], "label": True})
+            rows.append({"prompt": item["prompt"], "completion": item["rejected"], "label": False})
+    if not rows:
+        raise ValueError(f"No KTO rows loaded from {path}")
+    desirable = sum(1 for row in rows if row["label"])
+    undesirable = len(rows) - desirable
+    print(f"KTO rows: {len(rows)} (desirable={desirable}, undesirable={undesirable})")
+    return Dataset.from_list(rows)
 
-kto_data = []
-for item in dpo_data:
-    # chosen 作为正样本（label=true）
-    kto_data.append({
-        "prompt": item["prompt"],
-        "completion": item["chosen"],
-        "label": True
-    })
-    # rejected 作为负样本（label=false）
-    kto_data.append({
-        "prompt": item["prompt"],
-        "completion": item["rejected"],
-        "label": False
-    })
 
-print(f"  DPO 数据量：{len(dpo_data)} 条")
-print(f"  KTO 数据量：{len(kto_data)} 条（正负样本各半）")
+def resolve_device(requested: str) -> tuple[bool, str]:
+    if requested == "cpu":
+        return True, "cpu"
+    mps_available = bool(getattr(torch.backends, "mps", None) and torch.backends.mps.is_available())
+    if requested == "mps":
+        if not mps_available:
+            raise RuntimeError("MPS requested but not available")
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+        return False, "mps"
+    return (not mps_available), "mps" if mps_available else "cpu"
 
-# 3. KTO 训练
-print(f"\n[3/3] 开始 KTO 训练")
 
-# KTO 核心原理（来自前景理论）：
-# - 人类对"损失"的敏感度高于"收益"
-# - 模型应该同时学习"什么是好的"和"什么是坏的"
-# - 对"坏的"惩罚更重
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
-class KTOTrainer:
-    def __init__(self, model, tokenizer, beta=0.1, lam=0.1):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.beta = beta
-        self.lam = lam  # 惩罚系数
-        self.optimizer = torch.optim.AdamW(model.parameters(), lr=5e-6)
 
-    def compute_log_prob(self, prompt, completion):
-        """计算生成概率的对数"""
-        full_text = f"用户：{prompt}\n助手：{completion}"
-        inputs = self.tokenizer(full_text, return_tensors="pt", truncation=True, max_length=256)
+def main() -> int:
+    args = parse_args()
+    if args.batch_size * args.grad_accum <= 1:
+        raise ValueError("KTO requires effective batch size > 1 (batch_size * grad_accum)")
+    use_cpu, resolved_device = resolve_device(args.device)
+    torch_dtype = torch.bfloat16 if args.dtype == "bfloat16" else torch.float32
 
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-            logits = outputs.logits
+    print("=" * 60)
+    print("KTO training (TRL KTOTrainer)")
+    print(f"model={args.model}")
+    print(f"device={resolved_device} dtype={args.dtype} use_cpu={use_cpu}")
+    print("=" * 60)
 
-        # 计算 cross entropy loss 的负数作为 log probability
-        loss = torch.nn.functional.cross_entropy(
-            logits[:, :-1, :].contiguous().view(-1, logits.size(-1)),
-            inputs["input_ids"][:, 1:].contiguous().view(-1),
-            reduction='mean'
-        )
-        return -loss.item()
+    tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
-    def train_step(self, prompt, completion, label):
-        """单步训练"""
-        self.model.train()
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model,
+        dtype=torch_dtype,
+        trust_remote_code=True,
+    )
+    model.config.use_cache = False
 
-        log_prob = self.compute_log_prob(prompt, completion)
+    dataset = load_kto_dataset(args.data, args.limit)
+    peft_config = LoraConfig(
+        r=8,
+        lora_alpha=16,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        lora_dropout=0.05,
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
 
-        # KTO loss（简化版）
-        # 正样本：增大概率（log_prob 越大越好）
-        # 负样本：减小概率（log_prob 越小越好）
-        # 且对负样本惩罚更重（前景理论）
+    training_args = KTOConfig(
+        output_dir=args.output,
+        per_device_train_batch_size=args.batch_size,
+        gradient_accumulation_steps=args.grad_accum,
+        num_train_epochs=args.epochs,
+        max_steps=args.max_steps,
+        learning_rate=args.learning_rate,
+        beta=args.beta,
+        loss_type="kto",
+        desirable_weight=1.0,
+        undesirable_weight=1.0,
+        max_length=args.max_length,
+        logging_steps=10,
+        save_steps=args.save_steps,
+        save_total_limit=2,
+        gradient_checkpointing=True,
+        optim="adamw_torch",
+        bf16=args.dtype == "bfloat16",
+        fp16=False,
+        use_cpu=use_cpu,
+        report_to="none",
+        remove_unused_columns=False,
+        dataloader_num_workers=0,
+        seed=42,
+    )
 
-        if label:
-            # 正样本：最大化 log_prob
-            loss = -torch.tensor(log_prob, dtype=torch.float32, requires_grad=True)
-        else:
-            # 负样本：最小化 log_prob，且惩罚更重
-            loss = self.lam * torch.tensor(log_prob, dtype=torch.float32, requires_grad=True)
+    trainer = KTOTrainer(
+        model=model,
+        ref_model=None,
+        args=training_args,
+        train_dataset=dataset,
+        processing_class=tokenizer,
+        peft_config=peft_config,
+    )
+    train_result = trainer.train()
+    trainer.save_model(args.output)
+    tokenizer.save_pretrained(args.output)
 
-        # 反向传播
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+    adapter_file = Path(args.output) / "adapter_model.safetensors"
+    if not adapter_file.exists():
+        raise FileNotFoundError(f"TRL did not save an adapter at {adapter_file}")
 
-        return loss.item(), log_prob
+    changed, stats = _adapter_stats(args.output)
+    manifest = {
+        "method": "kto",
+        "model": args.model,
+        "output": args.output,
+        "device": resolved_device,
+        "dtype": args.dtype,
+        "rows": len(dataset),
+        "global_step": trainer.state.global_step,
+        "training_loss": getattr(train_result, "training_loss", None),
+        "adapter_sha256": sha256(adapter_file),
+        "adapter_changed": changed,
+        "adapter_stats": stats,
+        "hyperparameters": {
+            "epochs": args.epochs,
+            "max_steps": args.max_steps,
+            "batch_size": args.batch_size,
+            "grad_accum": args.grad_accum,
+            "learning_rate": args.learning_rate,
+            "max_length": args.max_length,
+            "beta": args.beta,
+        },
+    }
+    manifest_path = Path(args.output) / "training_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    def train(self, epochs=2):
-        """训练"""
-        for epoch in range(epochs):
-            total_loss = 0
-            pos_correct = 0
-            neg_correct = 0
-            pos_count = 0
-            neg_count = 0
+    print(f"adapter: {adapter_file}")
+    print(f"lora_B tensors: {stats['lora_b_tensors']}, max |w|: {stats['max_abs']}")
+    print(f"manifest: {manifest_path}")
+    if not args.no_verify and not changed:
+        raise RuntimeError("Training did not change the adapter; refusing to report success")
+    print("PASS: KTO adapter weights changed")
+    return 0
 
-            for i, item in enumerate(kto_data):
-                loss, log_prob = self.train_step(
-                    item["prompt"], item["completion"], item["label"]
-                )
 
-                total_loss += loss
-
-                if item["label"]:
-                    pos_count += 1
-                    if log_prob > 0:  # 正样本概率应该高
-                        pos_correct += 1
-                else:
-                    neg_count += 1
-                    if log_prob < 0:  # 负样本概率应该低
-                        neg_correct += 1
-
-                if (i + 1) % 20 == 0:
-                    print(f"  Epoch {epoch+1}, Step {i+1}/{len(kto_data)}: "
-                          f"Loss={loss:.4f}, LogProb={log_prob:.4f}, "
-                          f"Label={'True' if item['label'] else 'False'}")
-
-            pos_acc = pos_correct / max(pos_count, 1)
-            neg_acc = neg_correct / max(neg_count, 1)
-            avg_loss = total_loss / len(kto_data)
-            print(f"\nEpoch {epoch+1} 完成: Avg Loss={avg_loss:.4f}, "
-                  f"Pos Accuracy={pos_acc:.2%}, Neg Accuracy={neg_acc:.2%}")
-
-# 训练
-trainer = KTOTrainer(model, tokenizer)
-trainer.train(epochs=2)
-
-# 保存模型
-print(f"\n💾 保存模型到：{output_dir}")
-os.makedirs(output_dir, exist_ok=True)
-model.save_pretrained(output_dir)
-tokenizer.save_pretrained(output_dir)
-
-print("\n" + "=" * 50)
-print("KTO 训练完成！")
-print("=" * 50)
+if __name__ == "__main__":
+    raise SystemExit(main())

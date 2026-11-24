@@ -15,7 +15,8 @@ venv/
 *.bin
 *.safetensors
 *.gguf
-adapters/
+adapters/*
+!adapters/README.md
 fused_model/
 
 # Training outputs
@@ -26,7 +27,10 @@ runs/
 # Data (large files)
 data/*.jsonl
 !data/.gitkeep
-!data/benchmark_prompts.jsonl  # 允许 benchmark 文件被提交
+!data/train.jsonl
+!data/valid.jsonl
+!data/dpo.jsonl
+!data/benchmark_prompts.jsonl
 
 # IDE
 .vscode/
