@@ -136,9 +136,11 @@ README 中的 DPO 数字：
 | base-3b | 已完成 300-token v2 评估：3/9 |
 | base-7b | 已完成 300-token v2 评估：5/9 |
 | SFT 7B | 已完成 300-token v2 评估：4/9 |
+| Qwen3.5-4B | 已完成 300-token v2 评估（thinking 关闭）：4/9 |
+| Qwen3.5-9B | 已完成 300-token v2 评估（thinking 关闭）：4/9 |
 | 旧 `8/8` 结论 | 撤销 |
 
-**v2 结论**：base-7b 5/9 是当前最强基线；KTO/IPO/DPO-3b 均为 4/9，只比 base-3b 多命中 1 项，不能证明偏好优化有效。SFT-7b 4/9 低于 base-7b。所有模型都未达到 6/9，结构完整度和情绪递进是共同短板。旧 8/8 无法复现。详细数字见 `eval_results/V2_RESULTS.md`。
+**v2 结论**：base-7b 5/9 是当前最强基线；KTO/IPO/DPO-3b 均为 4/9，只比 base-3b 多命中 1 项，不能证明偏好优化有效。SFT-7b 4/9 低于 base-7b；Qwen3.5-4B/9B 也都是 4/9，9B 互动风格最好但幻觉率 0.281。所有模型都未达到 6/9，结构完整度、情绪递进和幻觉是共同短板。旧 8/8 无法复现。详细数字见 `eval_results/V2_RESULTS.md`。
 
 2026-11-24 的 180-token 报告已作废：30/30 base 输出达到上限，21/90 条输出出现“用户/助手”角色标签泄漏。正式报告改为 Qwen chat template，`max_tokens=300`，输出已无角色泄漏。
 

@@ -126,9 +126,23 @@ def _normalize(text: str) -> str:
 
 def _clean_generation(text: str) -> str:
     """Keep only the assistant turn if the model starts a fake next turn."""
+    if "</think>" in text:
+        text = text.split("</think>", 1)[1].lstrip()
     for marker in ("\n用户：", "\n助手：", "\n<|im_start|>", "<|im_end|>"):
         text = text.split(marker, 1)[0]
     return text.strip()
+
+
+def _chat_template_kwargs(tokenizer) -> Dict:
+    """Disable thinking for Qwen3.5-style templates; no-op for Qwen2.5."""
+    template = getattr(tokenizer, "chat_template", "") or ""
+    return {"enable_thinking": False} if "enable_thinking" in template else {}
+
+
+def _generation_signature(report: Dict) -> str:
+    params = dict(report.get("generation_params") or {})
+    params.setdefault("enable_thinking", False)
+    return json.dumps(params, sort_keys=True)
 
 
 def _target_passes(key: str, value: float) -> bool:
@@ -428,7 +442,7 @@ class LiveStreamEvaluator:
             print("⚠️ 报告 benchmark 哈希不一致；不能作为结论。")
 
         generation_params = {
-            json.dumps(report.get("generation_params") or {}, sort_keys=True)
+            _generation_signature(report)
             for report in reports
         }
         if len(generation_params) > 1:
@@ -482,6 +496,7 @@ def create_mlx_generator(
             messages,
             tokenize=False,
             add_generation_prompt=True,
+            **_chat_template_kwargs(tokenizer),
         )
         output = generate(
             model,
@@ -536,7 +551,12 @@ def main() -> int:
         model_path=args.model,
         adapter_path=args.adapter,
         judge_model=args.judge_model,
-        generation_params={"max_tokens": args.max_tokens, "temp": args.temp, "top_p": args.top_p},
+        generation_params={
+            "max_tokens": args.max_tokens,
+            "temp": args.temp,
+            "top_p": args.top_p,
+            "enable_thinking": False,
+        },
     )
 
     print(f"\n{'=' * 60}")

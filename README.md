@@ -3,8 +3,8 @@
 基于 QLoRA SFT + 偏好优化的直播带货话术生成实验。输入产品信息，输出主播风格的带货文案。
 
 **硬件要求**：24GB Mac Mini（Apple Silicon）<br>
-**正式评估**：Qwen2.5 base/SFT/DPO/KTO/IPO 六个模型，同 benchmark、同生成参数<br>
-**当前最好**：`base-7b` 5/9；SFT-7b 4/9，偏好优化 3B 均为 4/9
+**正式评估**：Qwen2.5 六个模型 + Qwen3.5-4B/9B，同 benchmark、同生成参数<br>
+**当前最好**：`base-7b` 5/9；Qwen3.5-4B/9B 均为 4/9，偏好优化 3B 均为 4/9
 
 > **审计说明**：旧版“KTO 8/8 指标达标”的结论已撤销。旧 KTO/IPO 权重与基座逐元素一致，旧评估数字由多次报告拼接而成。2026-11-24 的 180-token v2 结果也因全部输出被截断而作废；当前结论只使用 2026-11-25 的 300-token 报告。详见 [AUDIT.md](AUDIT.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
 
@@ -18,7 +18,9 @@
 | DPO 3B LoRA | ✅ | 已训练并融合；v2 4/9，幻觉率 0.036 为全组最低 |
 | KTO 3B | ✅ | 已用 TRL 重训并融合；v2 4/9 |
 | IPO 3B | ✅ | 已用 TRL 重训并融合；v2 4/9 |
-| 统一评估 v2 | ✅ | base-3b 3/9、KTO/IPO/DPO-3b 4/9、SFT-7b 4/9、base-7b 5/9 |
+| Qwen3.5-4B | ✅ | 本地 bf16；v2 4/9，互动 0.392 达标 |
+| Qwen3.5-9B | ✅ | 本地 bf16；v2 4/9，互动 0.483 达标但幻觉 0.281 |
+| 统一评估 v2 | ✅ | 8 个模型；base-7b 5/9 最高，其余 3B/Qwen3.5 为 3–4/9 |
 
 ## 目录结构
 
@@ -99,7 +101,8 @@ python scripts/verify_training.py --adapter adapters/ipo-3b-lora
 python scripts/test_eval_metrics.py
 
 # 同一 prompt、同一 30 条 benchmark、同一采样参数
-SAMPLES=30 bash scripts/run_eval_all.sh
+# QWEN35_ROOT 下存在 Qwen3.5-4B / Qwen3.5-9B 时会一并评估
+QWEN35_ROOT=/Users/xiaoxiao/work/finetuning/models SAMPLES=30 bash scripts/run_eval_all.sh
 
 # 只对比同 metric/prompt/benchmark/生成参数的报告；不一致会打印警告
 python scripts/eval_pipeline.py --compare eval_results/eval_v2_*.json
@@ -133,8 +136,10 @@ python scripts/eval_pipeline.py --compare eval_results/eval_v2_*.json
 | dpo-3b | 4/9 | 幻觉 0.036 最好，但结构 2.600、情绪 2.570、卖点 0.767 |
 | base-7b | **5/9** | 最高命中；幻觉 0.284、结构 3.167、情绪 2.900 |
 | sft-7b | 4/9 | 互动 0.354 达标，但句长 7.18、结构 2.233、幻觉 0.320 |
+| qwen3.5-4b | 4/9 | 互动 0.392 达标；卖点 0.733、幻觉 0.152、结构 3.200 |
+| qwen3.5-9b | 4/9 | 互动 0.483 最好；但卖点 0.728、幻觉 0.281 |
 
-详细表格和 caveat 见 [eval_results/V2_RESULTS.md](eval_results/V2_RESULTS.md)。结论：**没有任何模型接近 8/9；base-7b 是当前最强基线，继续调 Qwen2.5 偏好模型的收益有限，旧 8/8 不可复现。**
+详细表格和 caveat 见 [eval_results/V2_RESULTS.md](eval_results/V2_RESULTS.md)。结论：**没有任何模型接近 8/9；base-7b 仍是当前最强基线，Qwen3.5-4B/9B 没有解决结构、卖点、幻觉和情绪问题。旧 8/8 不可复现。**
 
 ## 文档
 

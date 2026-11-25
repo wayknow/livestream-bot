@@ -4,7 +4,7 @@
 > 基于 QLoRA SFT + 偏好优化，24GB Mac 本地可跑。
 > 适用于有实时互动的数字人直播场景。
 
-> **审计说明**：旧 KTO/IPO 训练未生效，旧“8/8”评估结论作废。2026-11-25 已用同一 benchmark、Qwen chat template、`max_tokens=300` 完成六个模型评估；最高为 base-7b 的 5/9。只有同协议报告才能比较，详见 [AUDIT.md](AUDIT.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
+> **审计说明**：旧 KTO/IPO 训练未生效，旧“8/8”评估结论作废。2026-11-25 已用同一 benchmark、Qwen chat template、`max_tokens=300` 完成八个模型评估；最高为 base-7b 的 5/9，Qwen3.5-4B/9B 均为 4/9。只有同协议报告才能比较，详见 [AUDIT.md](AUDIT.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
 
 ---
 
@@ -195,7 +195,7 @@ python -m mlx_lm.fuse \
 
 旧版“KTO 全面胜出”的对比表已删除。原因是 README 旧“DPO”列实际来自 SFT v7、KTO 旧权重与基座一致、KTO 指标跨报告拼接、样本量和 prompt 不一致。
 
-2026-11-25 用协议 v2 重跑六个模型（30 条，`max_tokens=300`，Qwen chat template）：
+2026-11-25 用协议 v2 重跑八个模型（30 条，`max_tokens=300`，Qwen chat template；六个 Qwen2.5 加 Qwen3.5-4B/9B）：
 
 | 模型 | 目标命中 | 主要问题 |
 |---|---:|---|
@@ -205,8 +205,10 @@ python -m mlx_lm.fuse \
 | dpo-3b | 4/9 | 幻觉 0.036 最好，但结构 2.600、情绪 2.570、卖点 0.767 |
 | base-7b | **5/9** | 当前最高；幻觉 0.284、结构 3.167、情绪 2.900 |
 | sft-7b | 4/9 | 互动 0.354 达标，但句长 7.18、结构 2.233、幻觉 0.320 |
+| qwen3.5-4b | 4/9 | 互动 0.392 达标；卖点 0.733、幻觉 0.152、结构 3.200 |
+| qwen3.5-9b | 4/9 | 互动 0.483 最好；但卖点 0.728、幻觉 0.281 |
 
-**结论**：base-7b 是当前最强基线；3B 偏好优化相对 base-3b 只多命中 1 项，不能证明方法有效。没有模型达到 6/9 以上，结构完整度和情绪递进是共同短板。旧 8/8 与 2026-11-24 的 180-token 结果均不可复现。详细数字和 caveat 见 `eval_results/V2_RESULTS.md`，完整审计见 [AUDIT.md](AUDIT.md)。
+**结论**：base-7b 仍是当前最强基线；Qwen3.5-4B/9B 没有超过它。3B 偏好优化相对 base-3b 只多命中 1 项，不能证明方法有效。没有模型达到 6/9 以上，结构完整度、情绪递进和幻觉是共同短板。旧 8/8 与 2026-11-24 的 180-token 结果均不可复现。详细数字和 caveat 见 `eval_results/V2_RESULTS.md`，完整审计见 [AUDIT.md](AUDIT.md)。
 
 ---
 

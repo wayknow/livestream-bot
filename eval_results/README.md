@@ -46,5 +46,7 @@ prints a warning when any of these differ.
 - `eval_v2_dpo-3b_20261125_143524.json` — 4/9
 - `eval_v2_base-7b_20261125_144233.json` — 5/9
 - `eval_v2_sft-7b_20261125_145245.json` — 4/9
+- `eval_v2_qwen3.5-4b_20261125_153905.json` — 4/9
+- `eval_v2_qwen3.5-9b_20261125_162618.json` — 4/9
 
 Summary and caveats: [`V2_RESULTS.md`](V2_RESULTS.md).

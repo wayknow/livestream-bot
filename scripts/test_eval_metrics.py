@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from eval_pipeline import LiveStreamEvaluator, _clean_generation  # noqa: E402
+from eval_pipeline import LiveStreamEvaluator, _chat_template_kwargs, _clean_generation  # noqa: E402
 
 
 class MetricTests(unittest.TestCase):
@@ -70,6 +70,20 @@ class MetricTests(unittest.TestCase):
 
     def test_generation_is_cut_at_fake_role_turn(self):
         text = "家人们，这款真的绝了！\n用户：下一个产品\n助手：好的"
+        self.assertEqual(_clean_generation(text), "家人们，这款真的绝了！")
+
+    def test_thinking_is_disabled_only_when_supported(self):
+        class Tokenizer:
+            chat_template = "{% if enable_thinking %}...{% endif %}"
+
+        class LegacyTokenizer:
+            chat_template = "plain template"
+
+        self.assertEqual(_chat_template_kwargs(Tokenizer()), {"enable_thinking": False})
+        self.assertEqual(_chat_template_kwargs(LegacyTokenizer()), {})
+
+    def test_reasoning_prefix_is_removed(self):
+        text = "反复思考...\n</think>\n家人们，这款真的绝了！"
         self.assertEqual(_clean_generation(text), "家人们，这款真的绝了！")
 
     def test_compare_warns_when_generation_params_differ(self):
