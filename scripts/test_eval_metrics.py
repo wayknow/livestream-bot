@@ -5,11 +5,13 @@ from __future__ import annotations
 
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from eval_pipeline import LiveStreamEvaluator  # noqa: E402
+from eval_pipeline import LiveStreamEvaluator, _clean_generation  # noqa: E402
 
 
 class MetricTests(unittest.TestCase):
@@ -65,6 +67,25 @@ class MetricTests(unittest.TestCase):
         self.assertIn("git_dirty", report)
         self.assertEqual(len(report["evaluator_sha256"]), 64)
         self.assertEqual(report["benchmark_size"], 1)
+
+    def test_generation_is_cut_at_fake_role_turn(self):
+        text = "家人们，这款真的绝了！\n用户：下一个产品\n助手：好的"
+        self.assertEqual(_clean_generation(text), "家人们，这款真的绝了！")
+
+    def test_compare_warns_when_generation_params_differ(self):
+        base = {
+            "model_name": "a",
+            "metric_version": "2.0",
+            "prompt_version": "livestream-v2",
+            "benchmark_sha256": "same",
+            "aggregated": {},
+            "generation_params": {"max_tokens": 180},
+        }
+        other = {**base, "model_name": "b", "generation_params": {"max_tokens": 300}}
+        output = StringIO()
+        with redirect_stdout(output):
+            self.evaluator.print_comparison([base, other])
+        self.assertIn("生成参数不一致", output.getvalue())
 
 
 if __name__ == "__main__":

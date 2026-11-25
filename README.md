@@ -3,22 +3,22 @@
 基于 QLoRA SFT + 偏好优化的直播带货话术生成实验。输入产品信息，输出主播风格的带货文案。
 
 **硬件要求**：24GB Mac Mini（Apple Silicon）<br>
-**已验证模型**：Qwen2.5-7B-Instruct + SFT LoRA<br>
-**偏好优化**：DPO/KTO/IPO 均已训练；3B 已完成 v2 评估（KTO 3/9、IPO 5/9、base 4/9）
+**正式评估**：Qwen2.5 base/SFT/DPO/KTO/IPO 六个模型，同 benchmark、同生成参数<br>
+**当前最好**：`base-7b` 5/9；SFT-7b 4/9，偏好优化 3B 均为 4/9
 
-> **2026-11-24 审计说明**：旧版“KTO 8/8 指标达标”的结论已撤销。旧 KTO/IPO 权重与基座逐元素一致，旧评估数字由多次报告拼接而成。完整证据和修复记录见 [AUDIT.md](AUDIT.md)。
+> **审计说明**：旧版“KTO 8/8 指标达标”的结论已撤销。旧 KTO/IPO 权重与基座逐元素一致，旧评估数字由多次报告拼接而成。2026-11-24 的 180-token v2 结果也因全部输出被截断而作废；当前结论只使用 2026-11-25 的 300-token 报告。详见 [AUDIT.md](AUDIT.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
 
 ## 当前状态
 
 | 环节 | 状态 | 说明 |
 |---|---|---|
 | 数据 | ✅ | 170 条 SFT train、30 条 valid、100 条 DPO 偏好对 |
-| SFT 7B LoRA | ✅ | `adapters/sft-7b` 有非零 LoRA 权重 |
+| SFT 7B LoRA | ⚠️ | 训练真实发生；v2 4/9，未优于 base-7b 的 5/9 |
 | 融合模型 | ✅ | `fused_model/livestream-7b-sft` |
-| DPO 3B LoRA | ⚠️ | 已训练并融合到 `fused_model/dpo-3b`，尚未跑 v2 评估 |
-| KTO 3B | ✅ | 已用 TRL 重训并融合；v2 30 条结果 3/9 达标 |
-| IPO 3B | ✅ | 已用 TRL 重训并融合；v2 30 条结果 5/9 达标 |
-| 统一评估 v2 | ✅ | base-3b 4/9、kto-3b 3/9、ipo-3b 5/9；详见 `eval_results/V2_RESULTS.md` |
+| DPO 3B LoRA | ✅ | 已训练并融合；v2 4/9，幻觉率 0.036 为全组最低 |
+| KTO 3B | ✅ | 已用 TRL 重训并融合；v2 4/9 |
+| IPO 3B | ✅ | 已用 TRL 重训并融合；v2 4/9 |
+| 统一评估 v2 | ✅ | base-3b 3/9、KTO/IPO/DPO-3b 4/9、SFT-7b 4/9、base-7b 5/9 |
 
 ## 目录结构
 
@@ -69,16 +69,13 @@ conda activate mlx
 cd /Users/xiaoxiao/work/finetuning/livestream-bot
 ```
 
-### 生成话术（当前可用：SFT 7B）
+### 生成话术（示例：SFT 7B，v2 4/9）
 
 ```bash
 python -m mlx_lm generate \
   --model ./fused_model/livestream-7b-sft \
-  --prompt '你是一位抖音直播带货话术专家。你的风格特征：①短句为主；②每3句话插入一次互动指令；③先讲痛点场景，再给解决方案，最后价格逼单；④情绪递进：平静→兴奋→急促；⑤口头禅：家人们、真的绝了、最后一波。
-
-用户：产品：充电宝；卖点：20000mAh、快充、轻便；时长：1分钟
-
-助手：' \
+  --system-prompt '你是一位抖音直播带货话术专家。你的风格特征：①短句为主；②每3句话插入一次互动指令；③先讲痛点场景，再给解决方案，最后价格逼单；④情绪递进：平静→兴奋→急促；⑤口头禅：家人们、真的绝了、最后一波。' \
+  --prompt '产品：充电宝；卖点：20000mAh、快充、轻便；时长：1分钟' \
   --max-tokens 300 \
   --temp 0.7 \
   --top-p 0.9
@@ -104,7 +101,7 @@ python scripts/test_eval_metrics.py
 # 同一 prompt、同一 30 条 benchmark、同一采样参数
 SAMPLES=30 bash scripts/run_eval_all.sh
 
-# 只对比 v2 报告；混入 v1 会打印警告
+# 只对比同 metric/prompt/benchmark/生成参数的报告；不一致会打印警告
 python scripts/eval_pipeline.py --compare eval_results/eval_v2_*.json
 ```
 
@@ -122,17 +119,22 @@ python scripts/eval_pipeline.py --compare eval_results/eval_v2_*.json
 | 口头禅重复度 | 最高频口头禅次数 / 总句数 | ≤0.30 |
 | 流畅度 | 默认规则评分；传 `--judge-model` 才用 LLM | ≥3.5 |
 
-每份 v2 报告都会记录 `metric_version`、`prompt_version`、`git_commit`、`git_dirty`、`evaluator_sha256`、`benchmark_sha256`、模型路径和 adapter 路径。不要跨版本拼数字。
+注意：当前 system prompt 写的是“每句不超过 15 字”，而平均句长目标是 15–25 字，两者本身冲突。句长结果只能用于相对比较，目标值需要下一轮重新定义。
 
-## 当前 v2 结果（30 条，max_tokens=180）
+每份 v2 报告都会记录 `metric_version`、`prompt_version`、`git_commit`、`git_dirty`、`evaluator_sha256`、`benchmark_sha256`、模型路径、adapter 路径和生成参数。不要跨版本或跨生成参数拼数字。
+
+## 当前 v2 结果（30 条，max_tokens=300，Qwen chat template）
 
 | 模型 | 目标命中 | 关键问题 |
 |---|---:|---|
-| base-3b | 4/9 | 互动过多、句长偏长、结构/卖点/情绪不达标 |
-| kto-3b | 3/9 | 幻觉率 0.167，卖点覆盖 0.722，未优于基座 |
-| ipo-3b | 5/9 | 结构 3.6、情绪 2.973，仍不达标 |
+| base-3b | 3/9 | 互动 0.749、结构 2.767、卖点 0.700、幻觉 0.117 |
+| kto-3b | 4/9 | 卖点 0.828，但结构 3.267、情绪 2.860、幻觉 0.150 |
+| ipo-3b | 4/9 | 卖点 0.839，但结构 3.067、情绪 3.167、幻觉 0.116 |
+| dpo-3b | 4/9 | 幻觉 0.036 最好，但结构 2.600、情绪 2.570、卖点 0.767 |
+| base-7b | **5/9** | 最高命中；幻觉 0.284、结构 3.167、情绪 2.900 |
+| sft-7b | 4/9 | 互动 0.354 达标，但句长 7.18、结构 2.233、幻觉 0.320 |
 
-详细表格和 caveat 见 [eval_results/V2_RESULTS.md](eval_results/V2_RESULTS.md)。结论：**真实重训后的 KTO 没有优于 3B 基座；旧 8/8 不可复现。**
+详细表格和 caveat 见 [eval_results/V2_RESULTS.md](eval_results/V2_RESULTS.md)。结论：**没有任何模型接近 8/9；base-7b 是当前最强基线，继续调 Qwen2.5 偏好模型的收益有限，旧 8/8 不可复现。**
 
 ## 文档
 

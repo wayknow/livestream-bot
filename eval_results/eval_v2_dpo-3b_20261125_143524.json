@@ -1,0 +1,845 @@
+{
+  "model_name": "dpo-3b",
+  "timestamp": "2026-11-25T14:35:24.404516",
+  "metric_version": "2.0",
+  "prompt_version": "livestream-v2",
+  "system_prompt": "你是一位抖音直播带货话术专家。你的风格特征：\n①短句为主，每句不超过15字\n②每3句话插入一次互动指令（\"扣1\"、\"对不对\"、\"听我说\"）\n③先讲痛点场景，再给解决方案，最后价格逼单\n④情绪递进：平静→兴奋→急促\n⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有\n⑥价格、数量、时间等具体信息只能来自用户输入；用户没给就不要编造。",
+  "model_path": "fused_model/dpo-3b",
+  "adapter_path": null,
+  "judge_model": null,
+  "generation_params": {
+    "max_tokens": 300,
+    "temp": 0.7,
+    "top_p": 0.9
+  },
+  "git_commit": "ac6191ded7be82f033a6ab93ddd2532f8f9909b5",
+  "git_dirty": true,
+  "evaluator_sha256": "9ee244fcb2df5da909f1d28d02aaf9b359482fe1881f22b651eab22bbffc4464",
+  "benchmark_size": 30,
+  "benchmark_sha256": "35287ade4872dd14f756d2ddadd935de47f92b6dd3e82f349e2bf91323e98da5",
+  "targets": {
+    "interactive_sentence_ratio": {
+      "label": "互动句占比",
+      "lower": 0.3,
+      "upper": 0.6
+    },
+    "avg_sentence_len": {
+      "label": "平均句长(字)",
+      "lower": 15.0,
+      "upper": 25.0
+    },
+    "spoken_ratio": {
+      "label": "口语词占比",
+      "lower": 0.02
+    },
+    "structure_completeness": {
+      "label": "结构完整度(0-5)",
+      "lower": 4.0
+    },
+    "selling_point_coverage": {
+      "label": "卖点覆盖率",
+      "lower": 0.8
+    },
+    "hallucination_rate": {
+      "label": "幻觉率",
+      "upper": 0.1
+    },
+    "emotion_progression": {
+      "label": "情绪递进(0-5)",
+      "lower": 3.5
+    },
+    "catchphrase_repeat": {
+      "label": "口头禅重复度",
+      "upper": 0.3
+    },
+    "fluency_score": {
+      "label": "流畅度(0-5)",
+      "lower": 3.5
+    }
+  },
+  "target_checks": {
+    "interactive_sentence_ratio": false,
+    "avg_sentence_len": false,
+    "spoken_ratio": true,
+    "structure_completeness": false,
+    "selling_point_coverage": false,
+    "hallucination_rate": true,
+    "emotion_progression": false,
+    "catchphrase_repeat": true,
+    "fluency_score": true
+  },
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "output": "生活太单调，你没发现吗？（扣1）\n皮肤暗沉，怎么显白？（对不对）\n口红显白不干燥，真的绝了。（听我说）\n这款口红，一抹就显白，不干燥，真的绝了。（有没有）\n你不想拥有它吗？（扣1）\n手慢无，最后一波！（听我说）\n家人们，趁早下单，限量抢购！（有没有）",
+      "metrics": {
+        "interactive_sentence_ratio": 0.571,
+        "avg_sentence_len": 8.9,
+        "spoken_ratio": 0.064,
+        "structure_completeness": 3,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.143,
+        "sentence_count": 14,
+        "char_count": 125,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/14 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "output": "皮肤干燥紧绷？扣1\n急救补水必备，真的绝了对不对\n玻尿酸满满，家人们，有没有\n现在下单，最后一波，对不对\n最后一丝水分，听我说，有没有\n数量有限，先抢为快，快点击购买吧，有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.857,
+        "avg_sentence_len": 12.6,
+        "spoken_ratio": 0.0568,
+        "structure_completeness": 2,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.143,
+        "sentence_count": 7,
+        "char_count": 88,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/7 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "output": "皮肤出油，晒伤疼吗？家人们，真的绝了！\n扣1\n3秒成膜，瞬间保护，你还在等什么？对不对\n扣1\n不油腻，清爽一整天，不黏腻，有没有\n扣1\nSPF50+，出门必备，防晒霜，听我说\n对不对\n今天最后一波，家人们，真的绝了！\n有没有\n价格？\n数量有限，先到先得，你还在犹豫什么，快来呀\n听我说\n最后机会，今天下单，不犹豫，家人们，真的绝了！\n有没有\n数量有限，限时限量，今天最后一波，家人们，真的绝了！\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.789,
+        "avg_sentence_len": 10.6,
+        "spoken_ratio": 0.0796,
+        "structure_completeness": 2,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.211,
+        "sentence_count": 19,
+        "char_count": 201,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/19 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "output": "肌肤干燥紧绷，皱纹悄悄爬上脸庞，家人们？\n玻色因帮肌肤修复，7天见证变化，对不对？\n专业说，一瓶抗皱面霜，效果立竿见影，听我说。\n有没有玻色因的面霜，我推荐这款，对不对？\n专业面霜，7天淡化皱纹，家人们，真的绝了。\n数量有限，限时优惠，最后一波机会，有没有？\n先下单，晚一秒，皮肤就老一岁，有没有？",
+      "metrics": {
+        "interactive_sentence_ratio": 1.0,
+        "avg_sentence_len": 21.3,
+        "spoken_ratio": 0.0268,
+        "structure_completeness": 4,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.286,
+        "sentence_count": 7,
+        "char_count": 149,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/7 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "output": "皮肤缺水出油时，粉底液却卡粉？家人们",
+      "metrics": {
+        "interactive_sentence_ratio": 0.5,
+        "avg_sentence_len": 9.0,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 0,
+        "selling_point_coverage": 0.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.5,
+        "sentence_count": 2,
+        "char_count": 18,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 0/2 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B006",
+      "category": "数码",
+      "scene": "开场暖场",
+      "prompt": "产品：蓝牙耳机；卖点：主动降噪、续航30小时；时长：1分钟",
+      "output": "家里人，蓝牙耳机听歌时噪音干扰大，我这有主动降噪的，真的绝了。\n扣1\n有没有想入手的，这耳机续航30小时，出门旅行带它就对了。\n扣1\n对不对，喜欢就给个机会，最后一波，有没有？",
+      "metrics": {
+        "interactive_sentence_ratio": 0.8,
+        "avg_sentence_len": 17.6,
+        "spoken_ratio": 0.0568,
+        "structure_completeness": 1,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 5,
+        "char_count": 88,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/5 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B007",
+      "category": "数码",
+      "scene": "逼单成交",
+      "prompt": "产品：充电宝；卖点：20000mAh、快充、轻便；时长：30秒；强调限时优惠",
+      "output": "家人们，你是不是经常担心手机没电？扣1\n电量危机，快给我来一个20000mAh的充电宝！对不对\n轻便小巧，随身携带，快充让你快速回血！听我说\n限时优惠，最后一波，家人们别错过！有没有\n今天下单，还有额外的小礼品赠送，家人们，把握机会！有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.8,
+        "avg_sentence_len": 12.0,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 1.2,
+        "catchphrase_repeat": 0.3,
+        "sentence_count": 10,
+        "char_count": 120,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B008",
+      "category": "数码",
+      "scene": "痛点切入",
+      "prompt": "产品：手机壳；卖点：防摔、颜值高、无线充电兼容；时长：1分钟",
+      "output": "家里手机摔过吧，家人们。防摔保护壳，真的绝了。颜值爆表，家人们。无线充电两不误，对不对？我这里颜色多，先来一拨，扣1。有没有喜欢的？有没有。",
+      "metrics": {
+        "interactive_sentence_ratio": 0.857,
+        "avg_sentence_len": 10.0,
+        "spoken_ratio": 0.0714,
+        "structure_completeness": 0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.286,
+        "sentence_count": 7,
+        "char_count": 70,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/7 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B009",
+      "category": "数码",
+      "scene": "场景种草",
+      "prompt": "产品：智能手表；卖点：心率监测、运动模式、7天续航；时长：2分钟；健身党",
+      "output": "心率波动大，运动没劲儿？（扣1）\n心率监测不精准，运动效果差？（扣1）\n手表电量不够，运动随时中断？（扣1）\n✅智能手表，心率监测准，运动模式多，7天续航长。（对不对）\n家人们，心动不如行动，现在下单，享限时优惠！（听我说）\n有没有心动，有没有想要的，现在下单吧，最后一波！（有没有）",
+      "metrics": {
+        "interactive_sentence_ratio": 0.667,
+        "avg_sentence_len": 11.8,
+        "spoken_ratio": 0.007,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.083,
+        "sentence_count": 12,
+        "char_count": 142,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B010",
+      "category": "数码",
+      "scene": "对比种草",
+      "prompt": "产品：机械键盘；卖点：热插拔、RGB灯效、静音轴；时长：1分钟；对比薄膜键盘",
+      "output": "痛点：家人们，你们用过薄膜键盘吗？多卡手、响应慢\n对不对，换我们家的机械键盘，精准操作，手速嗖嗖嗖\n有没有觉得机械键盘的RGB灯效特别炫酷？听我说\n静音轴，操作又安静，适合工作学习，有没有\n方案：家人们，选择我们家的机械键盘，热插拔超方便\n对不对，买一送一，数量有限，最后一波\n有没有心动了，家人们，现在下单还有优惠价\n有没有，抓紧时间，错过就没了，听我说",
+      "metrics": {
+        "interactive_sentence_ratio": 0.9,
+        "avg_sentence_len": 17.8,
+        "spoken_ratio": 0.0112,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.3,
+        "sentence_count": 10,
+        "char_count": 178,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B011",
+      "category": "食品",
+      "scene": "开场暖场",
+      "prompt": "产品：零食大礼包；卖点：10袋装、网红爆款、独立包装；时长：1分钟",
+      "output": "家人们，你是不是还在为零食找不到好品牌而头疼？\n对不对，这款零食大礼包就是你的宝藏选择。\n有没有10袋装的？网红爆款哦！\n对！独立包装，随吃随拿，方便到家。\n真的绝了，一口气吃上好几天。\n有没有心动了？最后一波，抓紧时间哦！\n家人们，这个价格真的是超值！\n有没有想要的？现在下单，还有优惠券等着你。\n有没有，家人们，不要错过这次机会！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.538,
+        "avg_sentence_len": 12.8,
+        "spoken_ratio": 0.0359,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.231,
+        "sentence_count": 13,
+        "char_count": 167,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B012",
+      "category": "食品",
+      "scene": "逼单成交",
+      "prompt": "产品：螺蛳粉；卖点：正宗柳州味、料足、3分钟速食；时长：30秒；最后50单",
+      "output": "家人们，来尝尝正宗柳州味的螺蛳粉吧！\n对不对，一包料足，一口地道滋味！\n有没有3分钟就解决的速食需求？！\n扣1，买一包尝鲜，绝了！\n有没有人跟我一样，想要一口正宗的味道？\n对不对，最后一波，买就送小料包哦！\n有没有心动的家人们，赶紧行动吧！\n有没有觉得这个价格很实惠呢？",
+      "metrics": {
+        "interactive_sentence_ratio": 1.0,
+        "avg_sentence_len": 16.9,
+        "spoken_ratio": 0.037,
+        "structure_completeness": 3,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.25,
+        "sentence_count": 8,
+        "char_count": 135,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/8 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B013",
+      "category": "食品",
+      "scene": "痛点切入",
+      "prompt": "产品：代餐奶昔；卖点：低卡、饱腹感强、6种口味；时长：1分钟；减肥党",
+      "output": "低卡代餐，你不想尝试吗？扣1\n饱腹感强，一餐满足，对不对\n6种口味，满足各种需求，有没有\n家人们，真的绝了，最后一波\n减肥路上，别犹豫了，听我说\n有没有人跟我一起，吃出好身材，听我说\n最后机会，今天不买明天没有，听我说\n最后一波，赶紧下单，家人们",
+      "metrics": {
+        "interactive_sentence_ratio": 0.889,
+        "avg_sentence_len": 13.7,
+        "spoken_ratio": 0.0407,
+        "structure_completeness": 2,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.3,
+        "catchphrase_repeat": 0.222,
+        "sentence_count": 9,
+        "char_count": 123,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/9 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B014",
+      "category": "食品",
+      "scene": "场景种草",
+      "prompt": "产品：坚果礼盒；卖点：每日一袋、7种坚果、无添加；时长：1分钟；送礼场景",
+      "output": "压力山大，每天坚果吃不够？\n扣1\n7种坚果，营养均衡，你知道吗？\n对不对\n家人们，现在下单，赠送定制礼盒，送礼最佳选择！\n有没有\n最后一波，价格再不捡漏，下次不保！\n听我说\n急促节奏，家人们，抓紧时间，错过再等一年！\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.7,
+        "avg_sentence_len": 11.2,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 2,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 10,
+        "char_count": 112,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B015",
+      "category": "食品",
+      "scene": "对比种草",
+      "prompt": "产品：酸奶；卖点：0蔗糖、高蛋白、活菌；时长：1分钟；对比普通酸奶",
+      "output": "牛奶冷饮时，肚子胀怎么办？家人们，来对了！\n扣1\n0蔗糖的酸奶，真的绝了，不含糖分！\n对不对\n高蛋白10g，比普通酸奶多，真好！\n听我说\n每杯添加活菌，益生元，补充肠道好帮手！\n有没有\n家人们，给我打个折，我要买一箱！\n对不对\n数量有限，限时优惠，最后一波，抓紧！\n有没有\n一秒都不能等，听我说，最后一波！\n有没有\n家人们，你还在犹豫什么？来吧！\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.667,
+        "avg_sentence_len": 9.8,
+        "spoken_ratio": 0.0339,
+        "structure_completeness": 2,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "hallucinated_numbers": [
+          "10"
+        ],
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.167,
+        "sentence_count": 18,
+        "char_count": 177,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/18 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B016",
+      "category": "家居",
+      "scene": "开场暖场",
+      "prompt": "产品：收纳盒；卖点：多层分类、透明可视、可折叠；时长：1分钟",
+      "output": "家里杂物乱，找东西费劲吧？家人们，真的绝了！透明盒让你一目了然。\n扣1\n多层设计，东西分门别类，空间利用得当。对不对？\n对不对\n可折叠收纳，节省空间，最后一步！\n有没有朋友要这样的收纳盒，价格呢？",
+      "metrics": {
+        "interactive_sentence_ratio": 0.556,
+        "avg_sentence_len": 10.9,
+        "spoken_ratio": 0.0714,
+        "structure_completeness": 2,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.111,
+        "sentence_count": 9,
+        "char_count": 98,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/9 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B017",
+      "category": "家居",
+      "scene": "逼单成交",
+      "prompt": "产品：洗衣液；卖点：亮白增艳、99%除菌、母婴适用；时长：30秒；买2送1",
+      "output": "遇到白色衣服染色难题了吗？扣1\n洗衣机塞不下这么多？对不对\n宝妈们最头疼的宝宝尿布疹？听我说\n亮白增艳、99%除菌，家人们\n母婴专用，这是给宝宝最好的呵护！对不对\n这次囤货，我要两桶，最后一波\n有没有考虑过给宝宝更健康的呵护？听我说\n买两桶送一桶，真的绝了\n你家的白色衣物，能不发愁吗？有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.533,
+        "avg_sentence_len": 9.7,
+        "spoken_ratio": 0.0342,
+        "structure_completeness": 1,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.067,
+        "sentence_count": 15,
+        "char_count": 146,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/15 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B018",
+      "category": "家居",
+      "scene": "痛点切入",
+      "prompt": "产品：保温杯；卖点：12小时保温、防漏、316不锈钢；时长：1分钟；办公室场景",
+      "output": "办公室高温，水杯凉了咋办？🤔\n家人们，这保温杯，给你保温一整天！👍\n对不对，真的绝了，我这保温杯，冬天热水暖手，夏天冰饮不凉手。👍\n有没有人用过防漏设计的保温杯？😱\n有了它，再也不怕水洒了，喝水更安心。👍\n有没有人担心不锈钢材质不好清洗？🤔\n放心，316不锈钢，健康耐用，清洁也很简单。👍\n扣1，现在下单，我让厂家给你们免费邮寄到家！🎉\n对不对，这个保温杯，真的超级实用，你家也来一个吧？🎉\n对不对，真的绝了，我这保温杯，316不锈钢，防漏，12小时保温，买一赠一，错过再等一年！🎉\n有没有，家人们，最后这波，抓紧时间下单，我让你享受专属优惠哦！🎉",
+      "metrics": {
+        "interactive_sentence_ratio": 0.364,
+        "avg_sentence_len": 12.5,
+        "spoken_ratio": 0.0474,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.091,
+        "sentence_count": 22,
+        "char_count": 274,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 1/22 (5%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B019",
+      "category": "家居",
+      "scene": "场景种草",
+      "prompt": "产品：香薰机；卖点：静音、定时、氛围灯；时长：1分钟；助眠场景",
+      "output": "安静夜晚，难以入眠？家人们\n痛点场景：扣1\n静音香薰机，让你享受静谧夜晚，对不对\n解决方案：对不对\n定时设定，想睡多久就睡多久，对不对\n氛围灯温馨，助你放松心情，对不对\n静音香薰机，让你享受静谧夜晚，对不对\n氛围灯调节，让你心情愉悦，对不对\n扣1\n有没有想要的？最后一波\n有没有想要的？对不对\n有没有想要的？听我说\n有没有想要的？对不对\n有没有想要的？最后一波\n有没有想要的？对不对\n有没有想要的？听我说\n有没有想要的？对不对\n有没有想要的？最后一波\n有没有想要的？对不对\n有没有想要的？听我说\n有没有想要的？对不对\n有没有想要的？最后一波\n有没有想要的？对不对\n有没有想要的？听我说",
+      "metrics": {
+        "interactive_sentence_ratio": 0.875,
+        "avg_sentence_len": 7.3,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 3,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.3,
+        "catchphrase_repeat": 0.025,
+        "sentence_count": 40,
+        "char_count": 292,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/40 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B020",
+      "category": "家居",
+      "scene": "对比种草",
+      "prompt": "产品：电动牙刷；卖点：声波震动、5种模式、30天续航；时长：1分钟；对比手动牙刷",
+      "output": "家人们，手动牙刷刷牙，费力不讨好，对不对？\n扣1\n电动牙刷，声波震动，清洁更彻底，有没有？\n对不对\n5种模式随意切换，口腔无死角，听我说\n对不对\n30天续航，充电一次，轻松刷一个月，有没有？\n对不对\n最后一波，家人们，赶紧下单，别等没了！\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 1.0,
+        "avg_sentence_len": 12.3,
+        "spoken_ratio": 0.0081,
+        "structure_completeness": 2,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 10,
+        "char_count": 123,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B021",
+      "category": "服饰",
+      "scene": "开场暖场",
+      "prompt": "产品：防晒衣；卖点：UPF50+、透气、便携；时长：1分钟",
+      "output": "家人们，晒伤太难受了，真的绝了！\n扣1\n透气防晒衣UPF50+，夏天必备！\n对不对\n带上它，随时随地防晒，真的绝了！\n听我说\n现在下单，还有50件库存，最后一波！\n有没有\n数量有限，家人们，抓紧时间！\n有没有\n想要的抓紧，错过不再有！\n有没有\n这个夏天，穿上它，防晒又时尚！\n有没有\n听我说，家人们，别犹豫了！\n有没有\n给家里人也买一件吧，真的绝了！\n有没有\n最后一波，家人们，冲啊！\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.75,
+        "avg_sentence_len": 9.8,
+        "spoken_ratio": 0.0816,
+        "structure_completeness": 2,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 20,
+        "char_count": 196,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/20 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B022",
+      "category": "服饰",
+      "scene": "逼单成交",
+      "prompt": "产品：运动裤；卖点：速干、弹力、显瘦；时长：30秒；最后30件",
+      "output": "运动裤速干弹力显瘦，你说对不对？\n扣1\n家人们，穿上它，运动更畅快，对不对？\n对不对\n最后一波，有没有人想买呢？\n听我说\n价格你有啥要求？数量呢？时间紧迫吗？\n有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.7,
+        "avg_sentence_len": 8.3,
+        "spoken_ratio": 0.0241,
+        "structure_completeness": 1,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.1,
+        "sentence_count": 10,
+        "char_count": 83,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B023",
+      "category": "服饰",
+      "scene": "痛点切入",
+      "prompt": "产品：内衣；卖点：无钢圈、聚拢、透气；时长：1分钟；大胸显小",
+      "output": "小朋友们，你是不是也有这样的烦恼？\n扣1\n姐妹们，胸大显小，那是怎样一种享受？\n对不对\n来来来，我的内衣，无钢圈设计，聚拢效果杠杠的！\n听我说\n选它，透气材质，夏天穿都不出汗！\n有没有\n最后一波，家人们，速抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.778,
+        "avg_sentence_len": 11.7,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.111,
+        "sentence_count": 9,
+        "char_count": 105,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/9 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B024",
+      "category": "服饰",
+      "scene": "场景种草",
+      "prompt": "产品：睡衣套装；卖点：纯棉、亲肤、多色可选；时长：1分钟；居家场景",
+      "output": "好睡不醒的家人们，试试这款纯棉睡衣",
+      "metrics": {
+        "interactive_sentence_ratio": 1.0,
+        "avg_sentence_len": 17.0,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 1,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 1.0,
+        "sentence_count": 1,
+        "char_count": 17,
+        "fluency_score": 4,
+        "fluency_reason": "长句数: 0/1 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B025",
+      "category": "服饰",
+      "scene": "对比种草",
+      "prompt": "产品：牛仔裤；卖点：高腰、弹力、不褪色；时长：1分钟；对比其他品牌",
+      "output": "遇到腿不直的烦恼吗？扣1\n高腰设计让你完美显腿长，对不对\n弹力面料，穿脱自由，有没有\n传统牛仔裤褪色快，家里人\n我家这款牛仔裤不褪色，对不对\n想要真材实料，听我说\n30支精梳棉，触感细腻，有没有\n数量有限，最后一波，听我说\n原价599，现在只要299，有没有\n快下手，不然后悔莫及，有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.818,
+        "avg_sentence_len": 13.1,
+        "spoken_ratio": 0.0,
+        "structure_completeness": 4,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.75,
+        "hallucinated_numbers": [
+          "299",
+          "30",
+          "599"
+        ],
+        "emotion_progression": 2.3,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 11,
+        "char_count": 144,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/11 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B026",
+      "category": "母婴",
+      "scene": "开场暖场",
+      "prompt": "产品：婴儿湿巾；卖点：80抽、无酒精、珍珠纹；时长：1分钟",
+      "output": "家人们，宝宝湿巾，80抽珍珠纹设计！\n对不对，无酒精更安全，亲肤不刺激！\n有没有，这样的好物，你们还在等什么？\n扣1\n听我说，新手爸妈，你们的宝贝太可爱了！\n对不对，每次换尿布，宝宝都皱眉头？\n对不对，有没有，这样的宝宝湿巾，让换尿布变成享受？\n对不对，无酒精，无刺激，宝宝用得安心！\n对不对，80抽，够用半个月，绝不错过哦！\n对不对，珍珠纹设计，擦得更干净，不会遗漏！\n对我说，家人们，你们是不是心动了？\n对不对，现在下单，还有限时优惠哦！\n对不对，有没有，今天最后一波，机会难得！\n有没有，宝宝的每一刻，我们都想把握住！\n有没有，家人们，最后一波机会，你们还在犹豫吗？\n有没有，今天下单，就送小样一份，真的绝了！\n对不对，家人们，你们还在等什么？\n有没有，家人们，今天下单，立即享受无酒精的舒适！\n有没有，家人们，记得，给宝宝最好的，就是这份湿巾！\n有没有，家人们，今天下单，机会不容错过！\n有没有，家人们，今天下单，让我们一起守护宝宝的每一天！\n有没有，家人们，今天下单，送小样一份，真的",
+      "metrics": {
+        "interactive_sentence_ratio": 1.0,
+        "avg_sentence_len": 20.3,
+        "spoken_ratio": 0.0157,
+        "structure_completeness": 5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 1.6,
+        "catchphrase_repeat": 0.409,
+        "sentence_count": 22,
+        "char_count": 447,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/22 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B027",
+      "category": "母婴",
+      "scene": "逼单成交",
+      "prompt": "产品：儿童水杯；卖点：防漏、Tritan材质、带吸管；时长：30秒；限时半价",
+      "output": "家里娃喝水难？真的绝了，防漏材质选Tritan，带吸管更方便。扣1\n宝宝喝得更安心，这水杯防漏材质好，吸管设计也很实用。对不对\n最后一波，有数量限制，现在下单半价优惠哦。听我说\n有没有想给娃买个这个的？家人们赶紧下单，错过不再有。有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.6,
+        "avg_sentence_len": 11.8,
+        "spoken_ratio": 0.0339,
+        "structure_completeness": 4,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.9,
+        "catchphrase_repeat": 0.1,
+        "sentence_count": 10,
+        "char_count": 118,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B028",
+      "category": "母婴",
+      "scene": "痛点切入",
+      "prompt": "产品：尿不湿；卖点：超薄、瞬吸、不侧漏；时长：1分钟；新生儿场景",
+      "output": "遇到宝贝不尿裤子吗？扣1\n薄如蝉翼的尿不湿来了，对不对\n超薄不侧漏，宝贝睡觉多安心，有没有\n我家宝贝一直湿湿的，真的绝了\n我给你安排上超薄款，听我说\n最后两包限量抢购，有没有\n价格从你那里来，数量有限，要抓紧，有没有",
+      "metrics": {
+        "interactive_sentence_ratio": 0.75,
+        "avg_sentence_len": 13.5,
+        "spoken_ratio": 0.0463,
+        "structure_completeness": 2,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.125,
+        "sentence_count": 8,
+        "char_count": 108,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/8 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B029",
+      "category": "母婴",
+      "scene": "场景种草",
+      "prompt": "产品：婴儿推车；卖点：轻便、可折叠、避震；时长：2分钟；出行场景",
+      "output": "出行途中，宝宝总是颠簸难受？（扣1）\n新手爸妈，推车不便？（扣1）\n轻便避震，一键折叠，家人们，真的绝了！（对不对）\n今天限时优惠，最后一波，家人们！（听我说）\n数量有限，有需要的抓紧，有没有？（有没有）",
+      "metrics": {
+        "interactive_sentence_ratio": 0.8,
+        "avg_sentence_len": 10.2,
+        "spoken_ratio": 0.0392,
+        "structure_completeness": 2,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 10,
+        "char_count": 102,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B030",
+      "category": "母婴",
+      "scene": "对比种草",
+      "prompt": "产品：辅食机；卖点：蒸煮一体、静音、易清洗；时长：1分钟；对比手动研磨",
+      "output": "家人们，你还在为宝宝辅食烦恼吗？对不对？\n压力大，做辅食太费劲，还得担心卫生吧。真的绝了。\n来试试我们的辅食机，蒸煮静音，一机搞定。有没有？\n静音不吵孩子，宝宝也能安心吃。对不对？\n易清洗设计，方便快捷，省时省力。有没有？\n家人们，最后一波，赶紧下单吧！听我说。",
+      "metrics": {
+        "interactive_sentence_ratio": 0.583,
+        "avg_sentence_len": 10.9,
+        "spoken_ratio": 0.0458,
+        "structure_completeness": 4,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_numbers": [],
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.167,
+        "sentence_count": 12,
+        "char_count": 131,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_sentence_ratio": {
+      "mean": 0.755,
+      "std": 0.168,
+      "min": 0.364,
+      "max": 1.0
+    },
+    "avg_sentence_len": {
+      "mean": 12.51,
+      "std": 3.421,
+      "min": 7.3,
+      "max": 21.3
+    },
+    "spoken_ratio": {
+      "mean": 0.032,
+      "std": 0.026,
+      "min": 0.0,
+      "max": 0.082
+    },
+    "structure_completeness": {
+      "mean": 2.6,
+      "std": 1.356,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "selling_point_coverage": {
+      "mean": 0.767,
+      "std": 0.284,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "hallucination_rate": {
+      "mean": 0.036,
+      "std": 0.145,
+      "min": 0.0,
+      "max": 0.75
+    },
+    "emotion_progression": {
+      "mean": 2.57,
+      "std": 0.881,
+      "min": 1.2,
+      "max": 5.0
+    },
+    "catchphrase_repeat": {
+      "mean": 0.214,
+      "std": 0.18,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "sentence_count": {
+      "mean": 12.0,
+      "std": 7.257,
+      "min": 1.0,
+      "max": 40.0
+    },
+    "char_count": {
+      "mean": 142.567,
+      "std": 81.087,
+      "min": 17.0,
+      "max": 447.0
+    },
+    "fluency_score": {
+      "mean": 4.933,
+      "std": 0.249,
+      "min": 4.0,
+      "max": 5.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 0/10 (0%)",
+      "unique_count": 18
+    },
+    "fluency_method": {
+      "mode": "rule",
+      "unique_count": 1
+    }
+  }
+}

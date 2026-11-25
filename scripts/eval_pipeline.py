@@ -124,6 +124,13 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", "", text)
 
 
+def _clean_generation(text: str) -> str:
+    """Keep only the assistant turn if the model starts a fake next turn."""
+    for marker in ("\n用户：", "\n助手：", "\n<|im_start|>", "<|im_end|>"):
+        text = text.split(marker, 1)[0]
+    return text.strip()
+
+
 def _target_passes(key: str, value: float) -> bool:
     spec = TARGETS.get(key)
     if spec is None:
@@ -412,6 +419,21 @@ class LiveStreamEvaluator:
                 "以下对比仅供排查，不能作为结论。"
             )
 
+        prompt_versions = {report.get("prompt_version", "unknown") for report in reports}
+        if len(prompt_versions) > 1:
+            print(f"⚠️ 报告 prompt 版本不一致: {sorted(prompt_versions)}；不能作为结论。")
+
+        benchmark_hashes = {report.get("benchmark_sha256", "unknown") for report in reports}
+        if len(benchmark_hashes) > 1:
+            print("⚠️ 报告 benchmark 哈希不一致；不能作为结论。")
+
+        generation_params = {
+            json.dumps(report.get("generation_params") or {}, sort_keys=True)
+            for report in reports
+        }
+        if len(generation_params) > 1:
+            print("⚠️ 报告生成参数不一致（如 max_tokens/temp/top_p）；不能作为结论。")
+
         header = f"{'指标':<20} |"
         for report in reports:
             header += f" {report['model_name'][:15]:^15} |"
@@ -452,15 +474,24 @@ def create_mlx_generator(
     sampler = make_sampler(temp=temp, top_p=top_p)
 
     def generate_text(prompt: str) -> str:
-        full_prompt = f"{SYSTEM_PROMPT}\n\n用户：{prompt}\n助手："
-        return generate(
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ]
+        full_prompt = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        output = generate(
             model,
             tokenizer,
             prompt=full_prompt,
             max_tokens=max_tokens,
             sampler=sampler,
             verbose=False,
-        ).strip()
+        )
+        return _clean_generation(output)
 
     return generate_text
 

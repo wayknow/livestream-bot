@@ -110,7 +110,7 @@
 - 适合有大量"单条标注"数据的场景
 
 **适用场景**：资源有限，只有二元好/坏标签。
-**Mac Mini**：✅ 方法本身可行；本项目旧实现无效，已改用 TRL `KTOTrainer` 重训 3B，但 v2 评估只有 3/9 达标，未优于 3B 基座。
+**Mac Mini**：✅ 方法本身可行；本项目旧实现无效，已改用 TRL `KTOTrainer` 重训 3B，300-token v2 为 4/9，仅比 base-3b 多命中 1 项，不能证明稳定有效。
 
 ---
 
@@ -201,12 +201,12 @@
 
 | 方法 | 脚本 | 状态 | 结果 |
 |------|------|------|------|
-| DPO | `scripts/dpo_train.py` | ✅ | rewards/margins ↑ 9倍（训练指标，未统一评估） |
-| IPO | `scripts/ipo_train.py` | ✅ | 已改为 TRL 并重训 3B；v2 30 条 5/9 达标 |
-| KTO | `scripts/kto_train.py` | ✅ | 已改为 TRL 并重训 3B；v2 30 条 3/9 达标 |
+| DPO | `scripts/dpo_train.py` | ✅ | 已融合；300-token v2 4/9，幻觉率 0.036 最低 |
+| IPO | `scripts/ipo_train.py` | ✅ | 已改为 TRL 并重训 3B；300-token v2 4/9 |
+| KTO | `scripts/kto_train.py` | ✅ | 已改为 TRL 并重训 3B；300-token v2 4/9 |
 | RLHF Demo | `scripts/ppo_train.py` | ✅ | 简化版 Demo |
 
 ---
 
-**最后更新**：2026-11-24
-**项目状态**：DPO/KTO/IPO 均已训练；3B KTO/IPO 已完成 v2 评估，KTO 未优于基座
+**最后更新**：2026-11-25
+**项目状态**：DPO/KTO/IPO 均为 4/9；base-3b 3/9、base-7b 5/9。偏好优化只比 3B 基座多命中 1 项，不能证明方法稳定有效。

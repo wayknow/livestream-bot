@@ -130,13 +130,17 @@ README 中的 DPO 数字：
 |---|---|
 | 数据生成 | 可信，`train=170 / valid=30 / dpo=100` |
 | SFT 7B LoRA | 可信，adapter 有非零 LoRA 权重 |
-| DPO 3B LoRA | 训练发生，但尚未在统一 benchmark 上评估 |
-| KTO 3B | 旧产物无效；已用 TRL 重训并完成 v2 30 条评估：3/9 达标 |
-| IPO 3B | 旧产物无效；已用 TRL 重训并完成 v2 30 条评估：5/9 达标 |
-| base-3b | 已完成 v2 30 条评估：4/9 达标 |
+| DPO 3B LoRA | 已训练并完成 300-token v2 评估：4/9 |
+| KTO 3B | 旧产物无效；已用 TRL 重训并完成 300-token v2 评估：4/9 |
+| IPO 3B | 旧产物无效；已用 TRL 重训并完成 300-token v2 评估：4/9 |
+| base-3b | 已完成 300-token v2 评估：3/9 |
+| base-7b | 已完成 300-token v2 评估：5/9 |
+| SFT 7B | 已完成 300-token v2 评估：4/9 |
 | 旧 `8/8` 结论 | 撤销 |
 
-**v2 结论**：真实重训后的 KTO 没有优于 3B 基座；IPO 略高于基座但仍未达标。三个 3B 模型都过度互动、句长偏长。旧 8/8 无法复现。详细数字见 `eval_results/V2_RESULTS.md`。
+**v2 结论**：base-7b 5/9 是当前最强基线；KTO/IPO/DPO-3b 均为 4/9，只比 base-3b 多命中 1 项，不能证明偏好优化有效。SFT-7b 4/9 低于 base-7b。所有模型都未达到 6/9，结构完整度和情绪递进是共同短板。旧 8/8 无法复现。详细数字见 `eval_results/V2_RESULTS.md`。
+
+2026-11-24 的 180-token 报告已作废：30/30 base 输出达到上限，21/90 条输出出现“用户/助手”角色标签泄漏。正式报告改为 Qwen chat template，`max_tokens=300`，输出已无角色泄漏。
 
 评测边界：30 条 benchmark 与 train/valid/dpo 无完全相同的 prompt，但有 9/30 个产品也出现在训练数据中（卖点与句式不同）。当前结果属于同域测试，不能当作完全未见产品的泛化结论。
 
@@ -160,4 +164,4 @@ SAMPLES=30 bash scripts/run_eval_all.sh
 python scripts/test_eval_metrics.py
 ```
 
-即使 3B KTO 已完成重训，也不要再使用“KTO 最适合数字人直播”的结论：v2 评估中 KTO 3/9，低于 base-3b 的 4/9。
+不要再使用“KTO 最适合数字人直播”的结论：正式 v2 中 KTO 与 IPO/DPO 都是 4/9，且都低于 base-7b 的 5/9。
