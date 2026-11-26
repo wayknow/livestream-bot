@@ -1,0 +1,2387 @@
+{
+  "model_name": "qwen3.5-4b-base-v3-s0",
+  "timestamp": "2026-11-26T16:03:15.511076",
+  "metric_version": "3.0",
+  "prompt_version": "livestream-v3",
+  "system_prompt": "你是一位抖音直播带货话术专家。你的风格特征：\n①短句为主，每句不超过15字\n②互动句占比控制在30%–50%，不要每句都喊\"扣1\"\n③结构：痛点场景→解决方案→价格说明→行动指令；有库存或限时信息时才做紧迫感\n④情绪递进：平静→兴奋→急促\n⑤口头禅：家人们、真的绝了、听我说、有没有\n⑥价格、数量、库存、时间、优惠等具体信息只能来自用户输入；用户没给就省略，或说\"价格以直播间为准\"。",
+  "model_path": "/Users/xiaoxiao/work/finetuning/models/Qwen3.5-4B",
+  "adapter_path": null,
+  "judge_model": null,
+  "generation_params": {
+    "max_tokens": 300,
+    "temp": 0.7,
+    "top_p": 0.9,
+    "seed": 0,
+    "enable_thinking": false
+  },
+  "git_commit": "877d8be092f8a7efd70fbe0dabb23439e3f86edb",
+  "git_dirty": true,
+  "evaluator_sha256": "5e18dd55ece65be50c49373d306a0a8adc7d50c94c60045d0f3f2d67c06a07e5",
+  "benchmark_size": 30,
+  "benchmark_sha256": "284715c91661e1b32ee0d26d144ed3f30760f2ce849991c3ec85f47de7c8f246",
+  "targets": {
+    "interactive_sentence_ratio": {
+      "label": "互动句占比",
+      "lower": 0.3,
+      "upper": 0.6
+    },
+    "spoken_ratio": {
+      "label": "口语词占比",
+      "lower": 0.02
+    },
+    "structure_coverage": {
+      "label": "结构覆盖(必需模块)",
+      "lower": 0.75
+    },
+    "selling_point_coverage": {
+      "label": "卖点覆盖率",
+      "lower": 0.8
+    },
+    "hallucination_rate": {
+      "label": "幻觉率",
+      "upper": 0.1
+    },
+    "emotion_progression": {
+      "label": "情绪递进(0-5)",
+      "lower": 3.5,
+      "min_pass_rate": 0.7
+    },
+    "catchphrase_repeat": {
+      "label": "口头禅重复度",
+      "upper": 0.3
+    },
+    "fluency_score": {
+      "label": "流畅度(0-5)",
+      "lower": 3.5
+    }
+  },
+  "target_checks": {
+    "interactive_sentence_ratio": true,
+    "spoken_ratio": true,
+    "structure_coverage": false,
+    "selling_point_coverage": true,
+    "hallucination_rate": false,
+    "emotion_progression": true,
+    "catchphrase_repeat": true,
+    "fluency_score": true
+  },
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "facts": {
+        "product": "口红",
+        "selling_points": [
+          "显白",
+          "不拔干"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，黄皮显黑真的绝了！\n有没有姐妹怕口红拔干卡纹？\n听我说，这款显白又水润。\n一抹顺滑，素颜也能提气色。\n现在价格只有平时一半！\n库存只剩最后 200 支！\n扣 1 锁单，手慢无！\n还有 30 秒就下架了！\n有没有抢到？没抢的别犹豫！\n最后 50 单，冲就完事了！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.455,
+        "avg_sentence_len": 12.2,
+        "spoken_ratio": 0.0448,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 3,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 3,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "30",
+          "50",
+          "200"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "200",
+            "unit": "支",
+            "surface": "200支",
+            "context": "平时一半库存只剩最后200支扣1锁单手慢无还有3",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "promotion",
+            "value": "30",
+            "unit": "s",
+            "surface": "30s",
+            "context": "支扣1锁单手慢无还有30s就下架了有没有抢到没",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "50",
+            "unit": "单",
+            "surface": "50单",
+            "context": "抢到没抢的别犹豫最后50单冲就完事了",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.091,
+        "sentence_count": 11,
+        "char_count": 134,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/11 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "facts": {
+        "product": "面膜",
+        "selling_points": [
+          "急救补水",
+          "玻尿酸"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 10,
+        "stock_unit": "单",
+        "promotion": [
+          "最后10单"
+        ]
+      },
+      "output": "家人们，皮肤卡粉怎么破？\n听我说，急救补水来了！\n玻尿酸猛灌，秒变水光肌！\n有没有想要尝鲜的？\n价格以直播间为准，手慢无！\n最后 10 单，拼手速咯！\n不扣 1 的扣“补水”，要的扣“抢”！\n真的绝了，这效果绝了！\n库存告急，只剩最后几单！\n还没抢到的抓紧了！\n30 秒搞定，赶紧下单！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.364,
+        "avg_sentence_len": 13.0,
+        "spoken_ratio": 0.0559,
+        "structure_coverage": 0.5,
+        "structure_completeness": 2.5,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 3,
+        "claim_support_rate": 1.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.091,
+        "sentence_count": 11,
+        "char_count": 143,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/11 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "facts": {
+        "product": "防晒霜",
+        "selling_points": [
+          "SPF50+",
+          "3秒成膜",
+          "不油腻"
+        ],
+        "duration": "2分钟",
+        "audience": "油皮女生",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，油皮夏天最怕什么？\n闷痘、长闭口、满脸油光。\n听我说，防晒选错，脸要烂！\n今天这款，专为油皮定制！\nSPF50+，硬防晒杠杠的。\n3 秒成膜，秒干不粘腻。\n有没有姐妹试过？评论区告诉我！\n真的绝了，像水一样抹开。\n不泛白，不搓泥，超清爽。\n油皮女生，闭眼冲就对了！\n价格以直播间为准，手慢无。\n库存只剩最后 200 单了！\n还有 3 分钟就下架，别犹豫！\n家人们，倒数 5 个数，3、2、1，上链接！\n有没有抢到？扣个“已拍”！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.294,
+        "avg_sentence_len": 12.8,
+        "spoken_ratio": 0.0275,
+        "structure_coverage": 1.0,
+        "structure_completeness": 5.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [],
+        "structure_order_score": 0.75,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "claim_count": 3,
+        "claim_support_rate": 0.667,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "200"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "200",
+            "unit": "单",
+            "surface": "200单",
+            "context": "准手慢无库存只剩最后200单了还有3min就下架",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 4.9,
+        "catchphrase_repeat": 0.118,
+        "sentence_count": 17,
+        "char_count": 218,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/17 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "facts": {
+        "product": "抗皱面霜",
+        "selling_points": [
+          "玻色因",
+          "7天淡纹"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，满脸细纹真的显老吗？\n听我说，皱纹是胶原蛋白流失的信号。\n别慌，玻色因能重塑面部支撑力。\n7 天淡纹不是夸张，是科学实证！\n真的绝了，把垮脸撑回紧致状态。\n有没有正在熬夜垮脸的姐妹？\n听我说，现在这瓶才是本命抗老。\n价格以直播间为准，库存随时在减。\n手慢无，错过这班要再等一年！\n家人们，赶紧去抢，真的绝了！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.5,
+        "avg_sentence_len": 15.8,
+        "spoken_ratio": 0.057,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 10,
+        "char_count": 158,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "facts": {
+        "product": "粉底液",
+        "selling_points": [
+          "持妆12小时",
+          "不卡粉"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家里人都看过来！\n粉底液卡粉是常态？\n停！听我说个绝招。\n别乱买大牌坑钱包。\n咱们这瓶真绝了。\n持妆十二小时不脱！\n上脸服帖不卡粉。\n干皮油皮都能扛。\n有没有同款肤质？\n扣 1 告诉我。\n闭眼冲不踩雷。\n库存不多手慢无。\n限时秒杀价太香。\n趁现在赶紧抢！\n价格以直播间为准。\n手慢拍大腿晚咯。\n快下单别犹豫！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.222,
+        "avg_sentence_len": 8.6,
+        "spoken_ratio": 0.013,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 0.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 18,
+        "char_count": 154,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/18 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B006",
+      "category": "数码",
+      "scene": "开场暖场",
+      "prompt": "产品：蓝牙耳机；卖点：主动降噪、续航30小时；时长：1分钟",
+      "facts": {
+        "product": "蓝牙耳机",
+        "selling_points": [
+          "主动降噪",
+          "续航30小时"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，上课开会总被吵到吗？\n耳机分贝大，听力真的受不了。\n听我说，这款主动降噪太绝了！\n世界瞬间安静，只有音乐声。\n续航 30 小时，一天充电一次就够了。\n有没有在座的，想马上体验的？\n价格以直播间为准，手慢无啊！\n库存只剩最后 500 单，拼手速了。\n家人们，3、2、1，开抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.444,
+        "avg_sentence_len": 15.7,
+        "spoken_ratio": 0.0496,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "1",
+          "500"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "spec",
+            "value": "1",
+            "unit": "d",
+            "surface": "1d",
+            "context": "只有音乐声续航30h1d充电一次就够了有没有",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "500",
+            "unit": "单",
+            "surface": "500单",
+            "context": "手慢无啊库存只剩最后500单拼手速了家人们321",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.222,
+        "sentence_count": 9,
+        "char_count": 141,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/9 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B007",
+      "category": "数码",
+      "scene": "逼单成交",
+      "prompt": "产品：充电宝；卖点：20000mAh、快充、轻便；时长：30秒；强调限时优惠",
+      "facts": {
+        "product": "充电宝",
+        "selling_points": [
+          "20000mAh",
+          "快充",
+          "轻便"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "限时优惠"
+        ]
+      },
+      "output": "手机没电焦虑了没？\n真的绝了，带上我给你们看！\n20000mAh，小小一个巨能装。\n20 分钟狂充一度，秒回血。\n全家人手一个，轻便不压身。\n有没有觉得这性价比无敌？\n限时秒杀，手慢拍大腿！\n库存只剩最后 50 台！\n还在等什么？\n家人们，左下角直接抢！\n扣 1 告诉我，我给你们链接！\n听我说，别犹豫了！\n最后一波，炸了！\n抢到的扣 2，没抢的扣 3！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.286,
+        "avg_sentence_len": 12.6,
+        "spoken_ratio": 0.0395,
+        "structure_coverage": 0.6,
+        "structure_completeness": 3.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 0.5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "50"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "50",
+            "unit": "台",
+            "surface": "50台",
+            "context": "慢拍大腿库存只剩最后50台还在等什么家人们左下",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "最后一波",
+            "context": "最后一波",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.071,
+        "sentence_count": 14,
+        "char_count": 177,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/14 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B008",
+      "category": "数码",
+      "scene": "痛点切入",
+      "prompt": "产品：手机壳；卖点：防摔、颜值高、无线充电兼容；时长：1分钟",
+      "facts": {
+        "product": "手机壳",
+        "selling_points": [
+          "防摔",
+          "颜值高",
+          "无线充电兼容"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "手机壳真的绝了！\n丢了手机有木有？\n听我说，这个能防摔。\n颜值高到不想摘。\n兼容无线充电，真香！\n家人们，有没有同款？\n价格以直播间为准。\n库存不多，手慢无。\n限时优惠，别犹豫。\n家人，赶紧去拍！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.2,
+        "avg_sentence_len": 9.8,
+        "spoken_ratio": 0.051,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.1,
+        "sentence_count": 10,
+        "char_count": 98,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B009",
+      "category": "数码",
+      "scene": "场景种草",
+      "prompt": "产品：智能手表；卖点：心率监测、运动模式、7天续航；时长：2分钟；健身党",
+      "facts": {
+        "product": "智能手表",
+        "selling_points": [
+          "心率监测",
+          "运动模式",
+          "7天续航"
+        ],
+        "duration": "2分钟",
+        "audience": "健身党",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，运动废掉多少身体？\n心率乱跳，数据不准真怕！\n听我说，这款手表全搞定。\n心率精准，运动模式超丰富。\n七天续航，不用老充电。\n有没有同款健身的宝宝？\n扣个 1，让我看到你们！\n价格以直播间为准哦。\n库存不多，手慢真的绝了。\n最后 50 台，拼手速的时候到了。\n抢到的家人们，评论区刷一波！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.455,
+        "avg_sentence_len": 13.4,
+        "spoken_ratio": 0.034,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "50"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "50",
+            "unit": "台",
+            "surface": "50台",
+            "context": "不多手慢真的绝了最后50台拼手速的时候到了抢到",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.182,
+        "sentence_count": 11,
+        "char_count": 147,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/11 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B010",
+      "category": "数码",
+      "scene": "对比种草",
+      "prompt": "产品：机械键盘；卖点：热插拔、RGB灯效、静音轴；时长：1分钟；对比薄膜键盘",
+      "facts": {
+        "product": "机械键盘",
+        "selling_points": [
+          "热插拔",
+          "RGB灯效",
+          "静音轴"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，经常打字的都懂吗？\n手酸、卡顿、声音吵，真的绝了。\n薄膜键盘早该扔了！\n听我说，这款机械键盘来了。\n热插拔，轴体自由换，爽翻天！\nRGB灯效，炫酷满屏，颜值拉满。\n静音轴，打字不扰人，办公神器。\n有没有家人们想换的？扣个“换”！\n只有这一百套，手慢无啊！\n价格以直播间为准，别等没货了。\n倒计时三二一，链接马上开抢！\n冲！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.231,
+        "avg_sentence_len": 12.7,
+        "spoken_ratio": 0.0485,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.154,
+        "sentence_count": 13,
+        "char_count": 165,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B011",
+      "category": "食品",
+      "scene": "开场暖场",
+      "prompt": "产品：零食大礼包；卖点：10袋装、网红爆款、独立包装；时长：1分钟",
+      "facts": {
+        "product": "零食大礼包",
+        "selling_points": [
+          "10袋装",
+          "网红爆款",
+          "独立包装"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，嘴巴寂寞别硬撑！\n是不是总想找点吃的？\n独立包装，干净又卫生！\n网红爆款，谁吃谁迷糊！\n十袋一大包，囤着超划算！\n有没有想吃的扣个“想”！\n价格直播间喊价，手慢无！\n听我说，趁现在赶紧抢！\n真的绝了，错过等一年！\n库存只剩最后几十份！\n还没动的家人，别犹豫！\n趁现在，拼手速的时候到了！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.333,
+        "avg_sentence_len": 12.2,
+        "spoken_ratio": 0.034,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.083,
+        "sentence_count": 12,
+        "char_count": 147,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B012",
+      "category": "食品",
+      "scene": "逼单成交",
+      "prompt": "产品：螺蛳粉；卖点：正宗柳州味、料足、3分钟速食；时长：30秒；最后50单",
+      "facts": {
+        "product": "螺蛳粉",
+        "selling_points": [
+          "正宗柳州味",
+          "料足",
+          "3分钟速食"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 50,
+        "stock_unit": "单",
+        "promotion": [
+          "最后50单"
+        ]
+      },
+      "output": "家人们，是不是总想吃正宗螺蛳粉？\n配料足到爆，3 分钟就能吃上。\n柳州味道正，酸爽上头真的绝了。\n有没有想吃的扣个 1？\n听我说，最后只剩 50 单了！\n手慢拍大腿，库存告急啦！\n赶紧下单，手慢无！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.429,
+        "avg_sentence_len": 14.1,
+        "spoken_ratio": 0.0606,
+        "structure_coverage": 0.75,
+        "structure_completeness": 3.8,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "claim_count": 2,
+        "claim_support_rate": 1.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.143,
+        "sentence_count": 7,
+        "char_count": 99,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/7 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B013",
+      "category": "食品",
+      "scene": "痛点切入",
+      "prompt": "产品：代餐奶昔；卖点：低卡、饱腹感强、6种口味；时长：1分钟；减肥党",
+      "facts": {
+        "product": "代餐奶昔",
+        "selling_points": [
+          "低卡",
+          "饱腹感强",
+          "6种口味"
+        ],
+        "duration": "1分钟",
+        "audience": "减肥党",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，减肥最怕饿肚子？\n嚼嘴皮子，代谢超慢怎么办？\n听我说，这款代餐奶昔来了！\n饱腹感超强，一罐顶三餐！\n真的绝了，6 种口味任选！\n有没有姐妹正在控糖？\n家里囤货的扣个 1 告诉我！\n减脂党专享，低卡不反弹！\n价格以直播间为准，手慢无！\n库存告急，离截止还有 5 分钟！\n来不及？那就拼手速啦！\n抢到的家人们，红包滴滴我！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.385,
+        "avg_sentence_len": 12.5,
+        "spoken_ratio": 0.0368,
+        "structure_coverage": 1.0,
+        "structure_completeness": 5.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.154,
+        "sentence_count": 13,
+        "char_count": 163,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B014",
+      "category": "食品",
+      "scene": "场景种草",
+      "prompt": "产品：坚果礼盒；卖点：每日一袋、7种坚果、无添加；时长：1分钟；送礼场景",
+      "facts": {
+        "product": "坚果礼盒",
+        "selling_points": [
+          "每日一袋",
+          "7种坚果",
+          "无添加"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，送礼最怕啥？怕不精致，怕没营养。\n听我说，这款礼盒直接拿捏了痛点。\n7 种大颗坚果，每日一袋超方便。\n真的绝了，0 添加，全家老小都放心。\n有没有想给爸妈带盒子的？扣“想要”告诉我。\n价格以直播间为准，手慢无，别犹豫了。",
+      "metrics": {
+        "interactive_sentence_ratio": 0.375,
+        "avg_sentence_len": 14.2,
+        "spoken_ratio": 0.0526,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_missing": [
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "0"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "spec",
+            "value": "0",
+            "unit": "",
+            "surface": "0",
+            "context": "日1袋超方便真的绝了0添加全家老小都放心有",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.125,
+        "sentence_count": 8,
+        "char_count": 114,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/8 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B015",
+      "category": "食品",
+      "scene": "对比种草",
+      "prompt": "产品：酸奶；卖点：0蔗糖、高蛋白、活菌；时长：1分钟；对比普通酸奶",
+      "facts": {
+        "product": "酸奶",
+        "selling_points": [
+          "0蔗糖",
+          "高蛋白",
+          "活菌"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，喝酸奶怕长胖吗？\n普通酸奶糖分高，肚子真的胀！\n听我说，这款真绝了！\n0 蔗糖，高蛋白，活性菌满满！\n有没有姐妹想试试？扣个 1 告诉我！\n普通款甜腻难喝，这款清爽解腻！\n每天一杯，肠道舒服到飞起！\n价格以直播间为准，手慢无！\n库存告急，只有最后几十单！\n想要健康身材的，别犹豫！\n来，3、2、1，拼手速了！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.333,
+        "avg_sentence_len": 13.2,
+        "spoken_ratio": 0.0253,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.083,
+        "sentence_count": 12,
+        "char_count": 158,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B016",
+      "category": "家居",
+      "scene": "开场暖场",
+      "prompt": "产品：收纳盒；卖点：多层分类、透明可视、可折叠；时长：1分钟",
+      "facts": {
+        "product": "收纳盒",
+        "selling_points": [
+          "多层分类",
+          "透明可视",
+          "可折叠"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家里乱不乱？看这里！\n透明可视，一眼找东西。\n多层分类，杂物全归位。\n可折叠省空间，太绝了！\n有没有同款收纳盒？\n现在下单超划算。\n库存不多，手慢无！\n价格以直播间为准。\n赶紧扣\"1\"，我来报数！\n听我说，别犹豫了！\n过时不候，快来抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.167,
+        "avg_sentence_len": 9.8,
+        "spoken_ratio": 0.0254,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 0.5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 12,
+        "char_count": 118,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B017",
+      "category": "家居",
+      "scene": "逼单成交",
+      "prompt": "产品：洗衣液；卖点：亮白增艳、99%除菌、母婴适用；时长：30秒；买2送1",
+      "facts": {
+        "product": "洗衣液",
+        "selling_points": [
+          "亮白增艳",
+          "99%除菌",
+          "母婴适用"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "买2送1"
+        ]
+      },
+      "output": "家人们，衣服发黄真难洗？\n亮白增艳，污渍秒消失！\n99% 除菌，母婴也放心。\n买二送一，福利太绝了！\n手慢无，只有最后 50 单！\n有没有宝妈想囤？扣“想”！\n听我说，拼手速的时候到了！\n库存告急，最后 3 分钟！\n没抢到？下次再看就没了。\n家人，快把链接点起来！\n真的绝了，别犹豫！\n还有 10 单，抢完即止！\n想要趁早，现在下单！\n还没扣 1 的抓紧啦！\n30 秒不抢，真没了！\n赶紧去抢，手速要快！\n最后几单，拼手速了！\n停？想看的扣“想”！\n没抢到的别哭，再来一波？\n最后 1 分钟，倒数开始！\n3、2、1，上链接！\n抢到就是赚到，冲鸭！\n没抢到的扣“遗憾”！\n听我说，机会只有一次！\n最后 30 秒，手慢拍大腿！\n家人们，趁现在赶紧冲！\n还有 5 单，最后 5 手速！\n抢到了扣“到手”，没抢的别走！\n3、2、1，拼了！\n没抢",
+      "metrics": {
+        "interactive_sentence_ratio": 0.182,
+        "avg_sentence_len": 11.2,
+        "spoken_ratio": 0.0353,
+        "structure_coverage": 0.25,
+        "structure_completeness": 1.2,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案",
+          "价格锚定"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.75,
+        "claim_count": 8,
+        "claim_support_rate": 0.25,
+        "unsupported_claim_count": 6,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "1",
+          "3",
+          "5",
+          "50"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "50",
+            "unit": "单",
+            "surface": "50单",
+            "context": "太绝了手慢无只有最后50单有没有宝妈想囤扣想听",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "promotion",
+            "value": "3",
+            "unit": "min",
+            "surface": "3min",
+            "context": "时候到了库存告急最后3min没抢到下次再看就没了",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "promotion",
+            "value": "1",
+            "unit": "min",
+            "surface": "1min",
+            "context": "到的别哭再来一波最后1min倒数开始321上链接",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "spec",
+            "value": "5",
+            "unit": "单",
+            "surface": "5单",
+            "context": "人们趁现在赶紧冲还有5单最后5手速抢到了扣到",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "spec",
+            "value": "5",
+            "unit": "",
+            "surface": "5",
+            "context": "在赶紧冲还有5单最后5手速抢到了扣到手没抢",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.9,
+        "catchphrase_repeat": 0.061,
+        "sentence_count": 33,
+        "char_count": 368,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/33 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B018",
+      "category": "家居",
+      "scene": "痛点切入",
+      "prompt": "产品：保温杯；卖点：12小时保温、防漏、316不锈钢；时长：1分钟；办公室场景",
+      "facts": {
+        "product": "保温杯",
+        "selling_points": [
+          "12小时保温",
+          "防漏",
+          "316不锈钢"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，办公喝水最头疼！\n热水变凉，一手拿烫手！\n有没有同款痛苦经历的？\n听我说，看这款真绝了！\n316 不锈钢，安全又耐用。\n防漏设计，坐车零烦恼。\n12 小时长效保温。\n早上烧的，下午还是热的！\n这种品质，咱们必须拿下。\n价格以直播间为准。\n库存不多，手慢无！\n3、2、1，开抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.25,
+        "avg_sentence_len": 11.8,
+        "spoken_ratio": 0.0141,
+        "structure_coverage": 1.0,
+        "structure_completeness": 5.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [],
+        "structure_order_score": 0.75,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.083,
+        "sentence_count": 12,
+        "char_count": 142,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B019",
+      "category": "家居",
+      "scene": "场景种草",
+      "prompt": "产品：香薰机；卖点：静音、定时、氛围灯；时长：1分钟；助眠场景",
+      "facts": {
+        "product": "香薰机",
+        "selling_points": [
+          "静音",
+          "定时",
+          "氛围灯"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，晚上睡不着？\n是不是噪音吵得睡不着？\n听我说，静音香薰来了。\n真的绝了，秒变静音房。\n有没有人想立刻入睡？\n扣个“睡”字让我看到！\n定时功能太贴心了。\n氛围灯浪漫又治愈。\n把焦虑都调成睡眠模式。\n今晚就决定，从此不失眠。\n价格以直播间为准。\n库存不多，手慢无哦。\n现在下单，今晚好梦！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.308,
+        "avg_sentence_len": 11.2,
+        "spoken_ratio": 0.0411,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.077,
+        "sentence_count": 13,
+        "char_count": 146,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B020",
+      "category": "家居",
+      "scene": "对比种草",
+      "prompt": "产品：电动牙刷；卖点：声波震动、5种模式、30天续航；时长：1分钟；对比手动牙刷",
+      "facts": {
+        "product": "电动牙刷",
+        "selling_points": [
+          "声波震动",
+          "5种模式",
+          "30天续航"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "手动刷牙半天，牙缝还堵不净？\n声波震动，清洁力直接翻倍！\n5 种模式，早晚都能灵活换。\n充电一次，整整 30 天不用愁。\n有没有刷过牙的朋友？扣个\"1\"。\n听我说，手动真的太费劲了！\n看看这清洁效果，真的绝了！\n这么好用的东西，谁还愿意用旧的？\n价格以直播间为准，手慢无！\n库存告急，想抢的赶紧冲！\n倒计时开始，动作要快！\n别犹豫，错过真拍大腿！\n家人们，最后 30 秒，拼手速！\n（商品入镜）看到没？真香！\n还在等什么？快把老公/老婆拉进来！\n（节奏加快）真的绝了！真的绝了！\n冲啊家人们，库存只剩最后 5 单！\n（急促）别看了，直接拍，别等！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.182,
+        "avg_sentence_len": 12.4,
+        "spoken_ratio": 0.0586,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.6,
+        "claim_count": 5,
+        "claim_support_rate": 0.4,
+        "unsupported_claim_count": 3,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "5",
+          "30"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "promotion",
+            "value": "30",
+            "unit": "s",
+            "surface": "30s",
+            "context": "过真拍大腿家人们最后30s拼手速商品入镜看到没",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "5",
+            "unit": "单",
+            "surface": "5单",
+            "context": "啊家人们库存只剩最后5单急促别看了直接拍别等",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.8,
+        "catchphrase_repeat": 0.136,
+        "sentence_count": 22,
+        "char_count": 273,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/22 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B021",
+      "category": "服饰",
+      "scene": "开场暖场",
+      "prompt": "产品：防晒衣；卖点：UPF50+、透气、便携；时长：1分钟",
+      "facts": {
+        "product": "防晒衣",
+        "selling_points": [
+          "UPF50+",
+          "透气",
+          "便携"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，夏天暴晒还在裸奔吗？\n紫外线太强，皮肤瞬间变黑老！\n听我说，这款防晒衣真的绝了！\nUPF50+，物理防晒，安全又放心。\n透气网眼，大夏天穿也不闷汗。\n口袋超大，手机钥匙随手放。\n有没有姐妹想要？扣个 1 告诉我！\n价格以直播间为准，库存不多。\n手慢无，赶紧去抢，错过等一年！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.4,
+        "avg_sentence_len": 14.1,
+        "spoken_ratio": 0.0284,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.333,
+        "claim_count": 3,
+        "claim_support_rate": 0.667,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.1,
+        "sentence_count": 10,
+        "char_count": 141,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B022",
+      "category": "服饰",
+      "scene": "逼单成交",
+      "prompt": "产品：运动裤；卖点：速干、弹力、显瘦；时长：30秒；最后30件",
+      "facts": {
+        "product": "运动裤",
+        "selling_points": [
+          "速干",
+          "弹力",
+          "显瘦"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 30,
+        "stock_unit": "件",
+        "promotion": [
+          "最后30件"
+        ]
+      },
+      "output": "家人们，夏天出汗别尴尬！\n速干弹力，显瘦又自在！\n有没有想要的不？扣“想要”！\n听我说，今天价格绝了！\n就剩最后 30 件啦！\n手慢真的拍不到！\n拼手速的时候到了！\n抢到的家人们双击 666！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.444,
+        "avg_sentence_len": 10.7,
+        "spoken_ratio": 0.0521,
+        "structure_coverage": 0.75,
+        "structure_completeness": 3.8,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 1,
+        "claim_support_rate": 1.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 3.9,
+        "catchphrase_repeat": 0.222,
+        "sentence_count": 9,
+        "char_count": 96,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/9 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B023",
+      "category": "服饰",
+      "scene": "痛点切入",
+      "prompt": "产品：内衣；卖点：无钢圈、聚拢、透气；时长：1分钟；大胸显小",
+      "facts": {
+        "product": "内衣",
+        "selling_points": [
+          "无钢圈",
+          "聚拢",
+          "透气"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，大胸显小太难了吧？\n穿内衣勒得喘不过气？\n有没有那种舒服又聚拢的？\n听我说，这款内衣绝了！\n无钢圈，透气不闷汗。\n聚拢效果，立马显小两码。\n真的绝了，大胸姐妹看过来。\n价格以直播间为准，抢完没。\n库存不多，手慢拍大腿！\n有没有想穿的？扣 1 让我看到。\n家人们，别犹豫，现在上链接。\n限时优惠，只有这一分钟。\n赶紧点击小黄车，带回家。",
+      "metrics": {
+        "interactive_sentence_ratio": 0.5,
+        "avg_sentence_len": 12.2,
+        "spoken_ratio": 0.0468,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.143,
+        "sentence_count": 14,
+        "char_count": 171,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/14 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B024",
+      "category": "服饰",
+      "scene": "场景种草",
+      "prompt": "产品：睡衣套装；卖点：纯棉、亲肤、多色可选；时长：1分钟；居家场景",
+      "facts": {
+        "product": "睡衣套装",
+        "selling_points": [
+          "纯棉",
+          "亲肤",
+          "多色可选"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，晚上回家累不累？\n纯棉睡衣，亲肤像被爱拥抱。\n多种颜色，哪个最戳你心巴？\n家人们，扣住喜欢的颜色！\n听我说，这质感真的绝了。\n有没有姐妹想睡个温柔觉？\n多色可选，今天直接安排。\n价格以直播间为准，手慢无！\n库存告急，还没抢的吗？\n趁现在，赶紧去选你的！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.4,
+        "avg_sentence_len": 13.0,
+        "spoken_ratio": 0.0308,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.2,
+        "sentence_count": 10,
+        "char_count": 130,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/10 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B025",
+      "category": "服饰",
+      "scene": "对比种草",
+      "prompt": "产品：牛仔裤；卖点：高腰、弹力、不褪色；时长：1分钟；对比其他品牌",
+      "facts": {
+        "product": "牛仔裤",
+        "selling_points": [
+          "高腰",
+          "弹力",
+          "不褪色"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，裤子勒肚子？\n高腰设计，显腰细一截！\n弹力面料，久坐不紧绷。\n越洗越深，绝不褪色。\n别家容易掉色发白。\n我们稳如泰山，穿半年不变。\n有没有？\n真的绝了！\n听我说，这个价格太惊了。\n库存只剩最后几十条。\n手慢无！\n想要的扣“想要”。\n抓紧抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.308,
+        "avg_sentence_len": 9.5,
+        "spoken_ratio": 0.0403,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 2.7,
+        "catchphrase_repeat": 0.077,
+        "sentence_count": 13,
+        "char_count": 124,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B026",
+      "category": "母婴",
+      "scene": "开场暖场",
+      "prompt": "产品：婴儿湿巾；卖点：80抽、无酒精、珍珠纹；时长：1分钟",
+      "facts": {
+        "product": "婴儿湿巾",
+        "selling_points": [
+          "80抽",
+          "无酒精",
+          "珍珠纹"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，宝宝口手都要擦？\n口水多，纸巾不够用？\n擦嘴怕伤肤，擦手怕掉屑？\n听我说，有这款无酒精湿巾！\n珍珠纹设计，湿水不粘手！\n80 抽大容量，出门带一包就够！\n真的绝了，母婴亲测才敢推！\n有没有宝妈想试试？扣个\"1\"！\n现在库存告急，手慢拍大腿！\n价格以直播间为准，抢完没！\n倒计时 10 秒，拼手速！\n家人们，别犹豫，赶紧囤！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.308,
+        "avg_sentence_len": 12.7,
+        "spoken_ratio": 0.0242,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "10"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "promotion",
+            "value": "10",
+            "unit": "s",
+            "surface": "10s",
+            "context": "播间为准抢完没倒计时10s拼手速家人们别犹豫赶",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.154,
+        "sentence_count": 13,
+        "char_count": 165,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/13 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B027",
+      "category": "母婴",
+      "scene": "逼单成交",
+      "prompt": "产品：儿童水杯；卖点：防漏、Tritan材质、带吸管；时长：30秒；限时半价",
+      "facts": {
+        "product": "儿童水杯",
+        "selling_points": [
+          "防漏",
+          "Tritan材质",
+          "带吸管"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "限时半价"
+        ]
+      },
+      "output": "家人们，孩子喝水总洒漏？\nTritan 材质，真的绝了！\n带吸管防漏，听我说多干净。\n有没有想要半价的？\n库存不多，手慢无！\n限时半价，赶紧拼手速！\n扣\"1\"告诉我想要！\n价格以直播间为准，冲鸭！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.375,
+        "avg_sentence_len": 12.2,
+        "spoken_ratio": 0.0408,
+        "structure_coverage": 0.8,
+        "structure_completeness": 4.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 0.667,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.125,
+        "sentence_count": 8,
+        "char_count": 98,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/8 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B028",
+      "category": "母婴",
+      "scene": "痛点切入",
+      "prompt": "产品：尿不湿；卖点：超薄、瞬吸、不侧漏；时长：1分钟；新生儿场景",
+      "facts": {
+        "product": "尿不湿",
+        "selling_points": [
+          "超薄",
+          "瞬吸",
+          "不侧漏"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "家人们，新生儿半夜哭闹太煎熬？\n宝宝尿多湿透，红屁屁哭不停？\n试试这款超薄的救星！\n瞬吸锁水，秒干不侧漏！\n听我说，新生儿专用才靠谱！\n有没有宝宝在用的？扣“有”！\n价格以直播间为准，手慢无！\n库存只剩最后几十组！\n别犹豫，抢完真没了！\n家人们，赶紧去拍！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.364,
+        "avg_sentence_len": 11.6,
+        "spoken_ratio": 0.0078,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 2.3,
+        "catchphrase_repeat": 0.182,
+        "sentence_count": 11,
+        "char_count": 128,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/11 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B029",
+      "category": "母婴",
+      "scene": "场景种草",
+      "prompt": "产品：婴儿推车；卖点：轻便、可折叠、避震；时长：2分钟；出行场景",
+      "facts": {
+        "product": "婴儿推车",
+        "selling_points": [
+          "轻便",
+          "可折叠",
+          "避震"
+        ],
+        "duration": "2分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "带娃出门累不累？\n重物拖着真想哭。\n听我说，带它走！\n轻便折叠超省心。\n有没有宝妈试试？\n避震效果绝了。\n宝宝睡得香不香？\n价格以直播间为准。\n手慢真的会拍大腿。\n库存不多快冲！\n先拍再说不犹豫！\n家人们，赶紧抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.25,
+        "avg_sentence_len": 8.9,
+        "spoken_ratio": 0.028,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 0.5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.083,
+        "sentence_count": 12,
+        "char_count": 107,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/12 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B030",
+      "category": "母婴",
+      "scene": "对比种草",
+      "prompt": "产品：辅食机；卖点：蒸煮一体、静音、易清洗；时长：1分钟；对比手动研磨",
+      "facts": {
+        "product": "辅食机",
+        "selling_points": [
+          "蒸煮一体",
+          "静音",
+          "易清洗"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "（平静）手磨辅食，大人累，宝宝难。\n（兴奋）蒸煮一体，一键搞定！\n（急促）静音运行，不吵宝宝睡！\n（急促）好清洗，一冲即净！\n（互动）家里宝宝多大？扣\"1\"我送福利！\n（平静）听我说，手磨太费劲。\n（兴奋）这台辅食机，真的绝了！\n（急促）手磨粉大易呛，这机细腻又香！\n（平静）价格以直播间为准，数量有限。\n（急促）库存告急，手慢无！\n（互动）有没有想抢的？公屏打“想要”！\n（平静）限时优惠，错过拍大腿！\n（急促）最后 3 台，抢完立刻恢复原价！\n（急促）别犹豫，现在下单就是省！\n（急促）倒计时 5 秒，3、2、1，开抢！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.118,
+        "avg_sentence_len": 15.4,
+        "spoken_ratio": 0.0153,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "行动指令"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_order_score": 0.5,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 3,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 3,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "3",
+          "5"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "stock",
+            "value": "3",
+            "unit": "台",
+            "surface": "3台",
+            "context": "惠错过拍大腿急促最后3台抢完立刻恢复原价急促",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          },
+          {
+            "kind": "promotion",
+            "value": "5",
+            "unit": "s",
+            "surface": "5s",
+            "context": "下单就是省急促倒计时5s321开抢",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存告急",
+            "context": "库存告急",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.5,
+        "catchphrase_repeat": 0.059,
+        "sentence_count": 17,
+        "char_count": 262,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/17 (0%)",
+        "fluency_method": "rule"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_sentence_ratio": {
+      "mean": 0.329,
+      "std": 0.102,
+      "min": 0.118,
+      "max": 0.5,
+      "ci95_low": 0.292,
+      "ci95_high": 0.363,
+      "pass_rate": 0.633,
+      "pass_rate_ci95_low": 0.467,
+      "pass_rate_ci95_high": 0.8
+    },
+    "avg_sentence_len": {
+      "mean": 12.317,
+      "std": 1.813,
+      "min": 8.6,
+      "max": 15.8,
+      "ci95_low": 11.65,
+      "ci95_high": 13.01
+    },
+    "spoken_ratio": {
+      "mean": 0.037,
+      "std": 0.014,
+      "min": 0.008,
+      "max": 0.061,
+      "ci95_low": 0.032,
+      "ci95_high": 0.042,
+      "pass_rate": 0.867,
+      "pass_rate_ci95_low": 0.733,
+      "pass_rate_ci95_high": 0.967
+    },
+    "structure_coverage": {
+      "mean": 0.588,
+      "std": 0.215,
+      "min": 0.25,
+      "max": 1.0,
+      "ci95_low": 0.509,
+      "ci95_high": 0.663,
+      "pass_rate": 0.2,
+      "pass_rate_ci95_low": 0.067,
+      "pass_rate_ci95_high": 0.367
+    },
+    "structure_completeness": {
+      "mean": 2.94,
+      "std": 1.064,
+      "min": 1.2,
+      "max": 5.0,
+      "ci95_low": 2.54,
+      "ci95_high": 3.317
+    },
+    "structure_order_score": {
+      "mean": 0.817,
+      "std": 0.244,
+      "min": 0.0,
+      "max": 1.0,
+      "ci95_low": 0.722,
+      "ci95_high": 0.895
+    },
+    "selling_point_coverage": {
+      "mean": 0.945,
+      "std": 0.124,
+      "min": 0.667,
+      "max": 1.0,
+      "ci95_low": 0.9,
+      "ci95_high": 0.978,
+      "pass_rate": 0.833,
+      "pass_rate_ci95_low": 0.7,
+      "pass_rate_ci95_high": 0.934
+    },
+    "hallucination_rate": {
+      "mean": 0.539,
+      "std": 0.385,
+      "min": 0.0,
+      "max": 1.0,
+      "ci95_low": 0.408,
+      "ci95_high": 0.679,
+      "pass_rate": 0.267,
+      "pass_rate_ci95_low": 0.133,
+      "pass_rate_ci95_high": 0.433
+    },
+    "claim_count": {
+      "mean": 2.0,
+      "std": 1.653,
+      "min": 0.0,
+      "max": 8.0,
+      "ci95_low": 1.433,
+      "ci95_high": 2.633
+    },
+    "claim_support_rate": {
+      "mean": 0.294,
+      "std": 0.327,
+      "min": 0.0,
+      "max": 1.0,
+      "ci95_low": 0.169,
+      "ci95_high": 0.418
+    },
+    "unsupported_claim_count": {
+      "mean": 1.233,
+      "std": 1.257,
+      "min": 0.0,
+      "max": 6.0,
+      "ci95_low": 0.833,
+      "ci95_high": 1.667
+    },
+    "contradicted_claim_count": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.0
+    },
+    "emotion_progression": {
+      "mean": 3.303,
+      "std": 0.581,
+      "min": 2.0,
+      "max": 4.9,
+      "ci95_low": 3.073,
+      "ci95_high": 3.507,
+      "pass_rate": 0.733,
+      "pass_rate_ci95_low": 0.567,
+      "pass_rate_ci95_high": 0.9
+    },
+    "catchphrase_repeat": {
+      "mean": 0.117,
+      "std": 0.057,
+      "min": 0.0,
+      "max": 0.222,
+      "ci95_low": 0.097,
+      "ci95_high": 0.137,
+      "pass_rate": 1.0,
+      "pass_rate_ci95_low": 1.0,
+      "pass_rate_ci95_high": 1.0
+    },
+    "sentence_count": {
+      "mean": 12.833,
+      "std": 4.879,
+      "min": 7.0,
+      "max": 33.0,
+      "ci95_low": 11.333,
+      "ci95_high": 14.667
+    },
+    "char_count": {
+      "mean": 156.167,
+      "std": 57.106,
+      "min": 96.0,
+      "max": 368.0,
+      "ci95_low": 137.767,
+      "ci95_high": 178.308
+    },
+    "fluency_score": {
+      "mean": 5.0,
+      "std": 0.0,
+      "min": 5.0,
+      "max": 5.0,
+      "ci95_low": 5.0,
+      "ci95_high": 5.0,
+      "pass_rate": 1.0,
+      "pass_rate_ci95_low": 1.0,
+      "pass_rate_ci95_high": 1.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 0/13 (0%)",
+      "unique_count": 12
+    },
+    "fluency_method": {
+      "mode": "rule",
+      "unique_count": 1
+    }
+  },
+  "rescored_at": "2026-11-26T16:40:49.443001",
+  "source_git_commit": "877d8be092f8a7efd70fbe0dabb23439e3f86edb",
+  "source_evaluator_sha256": "f587bd5ffb939bc5730583896f747419251150c79abb1a15597db99fd6156952",
+  "rescore_note": "Re-scored from saved outputs with the current evaluator; no model generation was rerun."
+}

@@ -1,0 +1,25 @@
+# Qwen3.5-4B LoRA SFT on the fact-grounded, product-disjoint sft-v4 data.
+model: "../models/Qwen3.5-4B"
+train: true
+data: "./data/sft_v4"
+
+fine_tune_type: "lora"
+num_layers: 8
+batch_size: 1
+iters: 600
+val_batches: 10
+learning_rate: 5.0e-5
+steps_per_report: 10
+steps_per_eval: 100
+save_every: 100
+max_seq_length: 384
+mask_prompt: true
+seed: 42
+adapter_path: "./adapters/qwen3.5-4b-sft-v4"
+grad_checkpoint: true
+clear_cache_threshold: "16GB"
+
+lora_parameters:
+  rank: 16
+  scale: 32
+  dropout: 0.05

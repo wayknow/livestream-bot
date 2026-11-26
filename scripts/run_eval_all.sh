@@ -10,6 +10,7 @@ SAMPLES="${SAMPLES:-30}"
 TEMP="${TEMP:-0.7}"
 TOP_P="${TOP_P:-0.9}"
 MAX_TOKENS="${MAX_TOKENS:-300}"
+SEED="${SEED:-0}"
 QWEN35_ROOT="${QWEN35_ROOT:-$HOME/work/finetuning/models}"
 
 run_eval() {
@@ -18,7 +19,7 @@ run_eval() {
   local adapter="${3:-}"
   local cmd=(python scripts/eval_pipeline.py --model "$model" --name "$name"
     --samples "$SAMPLES" --temp "$TEMP" --top-p "$TOP_P"
-    --max-tokens "$MAX_TOKENS" --save)
+    --max-tokens "$MAX_TOKENS" --seed "$SEED" --save)
   if [[ -n "$adapter" ]]; then
     if [[ ! -d "$adapter" ]]; then
       echo "SKIP $name: adapter not found: $adapter"

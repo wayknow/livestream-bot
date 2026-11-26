@@ -136,8 +136,8 @@ README 中的 DPO 数字：
 | base-3b | 已完成 300-token v2 评估：3/9 |
 | base-7b | 已完成 300-token v2 评估：5/9 |
 | SFT 7B | 已完成 300-token v2 评估：4/9 |
-| Qwen3.5-4B | 已完成 300-token v2 评估（thinking 关闭）：4/9 |
-| Qwen3.5-9B | 已完成 300-token v2 评估（thinking 关闭）：4/9 |
+| Qwen3.5-4B | v3 基线 6/8；SFT-v4 8/8（两个 seed），adapter 权重校验通过 |
+| Qwen3.5-9B | v3 同协议生成 6/8；结构/幻觉未过 |
 | 旧 `8/8` 结论 | 撤销 |
 
 **v2 结论**：base-7b 5/9 是当前最强基线；KTO/IPO/DPO-3b 均为 4/9，只比 base-3b 多命中 1 项，不能证明偏好优化有效。SFT-7b 4/9 低于 base-7b；Qwen3.5-4B/9B 也都是 4/9，9B 互动风格最好但幻觉率 0.281。所有模型都未达到 6/9，结构完整度、情绪递进和幻觉是共同短板。旧 8/8 无法复现。详细数字见 `eval_results/V2_RESULTS.md`。
@@ -145,6 +145,31 @@ README 中的 DPO 数字：
 2026-11-24 的 180-token 报告已作废：30/30 base 输出达到上限，21/90 条输出出现“用户/助手”角色标签泄漏。正式报告改为 Qwen chat template，`max_tokens=300`，输出已无角色泄漏。
 
 评测边界：30 条 benchmark 与 train/valid/dpo 无完全相同的 prompt，但有 9/30 个产品也出现在训练数据中（卖点与句式不同）。当前结果属于同域测试，不能当作完全未见产品的泛化结论。
+
+### v3 指标修正（2026-11-25）
+
+- 平均句长目标撤销，仅保留为诊断值。
+- 风格指标使用 typed slot 归一化：`<PRICE>`、`<COUNT>`，并归一化中文数字、单位和常见同义表达。
+- 幻觉评估不参与通配；使用原始输出对 benchmark `facts` 做 claim 级校验，区分 supported / unsupported / contradicted。
+- benchmark 每条 prompt 增加结构化 `facts`，缺失价格、库存等字段明确写为 `null`。
+- 情绪递进从均值判定改为单条通过率 ≥70%。
+- 新增 10 条 gold 话术，gold 通过 8/8；已有 8 份输出完成 v3 离线重算。
+
+v3 离线结果：Qwen3.5-9B 6/8、Qwen3.5-4B 5/8，其余模型 4/8；结构和 claim 级幻觉仍是全员失败项。详见 `eval_results/V3_RESCORE.md`。
+
+### SFT-v4 修正（2026-11-26）
+
+最新的 `20261126_152359` 离线重算修复了小数价格、discourse number 误报、条件结构和促销匹配问题；Qwen3.5-4B/9B 均为 6/8，其余六个模型 4/8。因此上面的 `5/8` 是旧口径，已由 `V3_RESCORE.md` 更新。
+
+随后用 `scripts/build_sft_v4.py` 构造 600 train + 120 valid：
+
+- prompt 唯一率 100%，train/valid 产品级切分；
+- 与 benchmark 产品零重叠；
+- 720 条参考话术全部先通过 v3 的 8/8。
+
+Qwen3.5-4B LoRA 训练使用 `config_qwen35_sft.yaml`（batch 1、600 iters、rank 16、最后 8 层）。验证 loss 在 Iter 300 回升到 0.451，但 final 回落到 0.369；同协议评估 Iter 200/300/600，三者都是 8/8，最终选择幻觉率最低且两两相似度相对最低的 final。
+
+当前结果：base 4B 6/8、SFT-v4 8/8（seed 0/1），幻觉率从 0.539 降到 0.011/0.000；9B base 仍为 6/8。**审计边界**：SFT 的句级唯一率只有 46.3%、两两相似度 0.582，输出模板化明显；流畅度和情绪指标是规则/词表实现，不能替代人工听感。8/8 只代表当前 30 条 benchmark 的自动指标通过，不代表生产可用。详见 `eval_results/V3_SFT_V4_RESULTS.md`。
 
 ---
 

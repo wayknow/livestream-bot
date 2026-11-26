@@ -4,7 +4,7 @@
 > 基于 QLoRA SFT + 偏好优化，24GB Mac 本地可跑。
 > 适用于有实时互动的数字人直播场景。
 
-> **审计说明**：旧 KTO/IPO 训练未生效，旧“8/8”评估结论作废。2026-11-25 已用同一 benchmark、Qwen chat template、`max_tokens=300` 完成八个模型评估；最高为 base-7b 的 5/9，Qwen3.5-4B/9B 均为 4/9。只有同协议报告才能比较，详见 [AUDIT.md](AUDIT.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
+> **审计说明**：旧 KTO/IPO 训练未生效，旧“8/8”评估结论作废。2026-11-26 在 Qwen3.5-4B 上用事实一致的 SFT-v4 数据重新训练，并以 v3 prompt、同 seed、同 30 条 benchmark 达到 8/8；幻觉率从 0.539 降到 0.011（seed 1 为 0.000）。结构与事实指标已过，但模板化仍重，详见 [V3_SFT_V4_RESULTS.md](eval_results/V3_SFT_V4_RESULTS.md) 与 [AUDIT.md](AUDIT.md)。
 
 ---
 
@@ -51,6 +51,18 @@
 }
 ```
 
+当前主线训练数据为 `data/sft_v4/`：600 条 train、120 条 valid，prompt 全部唯一；按产品切分，train/valid 产品不重叠，并与 benchmark 产品零重叠。每条参考话术都先通过 v3 的 8/8 目标，且价格、库存、优惠等事实只来自输入。构造脚本为 `scripts/build_sft_v4.py`，元数据在 `data/sft_v4/metadata.json`。
+
+```json
+{
+  "messages": [
+    {"role": "system", "content": "livestream-v3 system prompt"},
+    {"role": "user", "content": "产品：宝宝面霜；卖点：长效保湿、无香精、舒缓配方；时长：1分钟；目标人群：宝妈"},
+    {"role": "assistant", "content": "今天给大家带来宝宝面霜。宝妈是不是也遇到过换季泛红？……价格以直播间为准，喜欢的别错过。"}
+  ]
+}
+```
+
 ### DPO 偏好对（`data/dpo.jsonl`）
 
 ```json
@@ -83,7 +95,22 @@
 
 **场景类型**：开场暖场、逼单成交、痛点切入、场景种草、对比种草
 
-### 第二步：QLoRA SFT（7B）
+### 第二步（当前主线）：Qwen3.5-4B LoRA SFT-v4
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| 模型 | Qwen3.5-4B | 本地 bf16 |
+| 数据 | `data/sft_v4/` | 600 train + 120 valid，产品级切分 |
+| LoRA layers | 8 | 只训最后 8 层 |
+| r / alpha / dropout | 16 / 32 / 0.05 | 24GB M4 验证配置 |
+| batch_size | 1 | batch 2 会 Metal OOM |
+| iters | 600 | 峰值内存约 12.7GB |
+| max_seq_length | 384 | mask prompt |
+| learning_rate | 5e-5 | 固定学习率 |
+
+训练命令：`bash scripts/train_qwen35_sft.sh`。训练后必须运行 `verify_training.py --adapter adapters/qwen3.5-4b-sft-v4`。最终评估比较了 Iter 200/300/600，选择幻觉率最低且多样性相对较好的 final。
+
+### 历史配置：QLoRA SFT（7B）
 
 | 参数 | 值 | 说明 |
 |------|-----|------|
@@ -120,7 +147,7 @@ python -m mlx_lm.fuse \
 
 ## 四、评估体系
 
-### 评估指标（协议 v2）
+### 历史评估指标（协议 v2，已由 v3 取代）
 
 #### 规则指标
 
@@ -135,7 +162,7 @@ python -m mlx_lm.fuse \
 | 情绪递进 | 平静→兴奋→急促的真实递进程度 | ≥3.5/5 | 平坦文本不再得高分 |
 | 口头禅重复度 | 最高频口头禅次数 / 总句数 | ≤0.30 | 避免过度重复 |
 
-注意：system prompt 要求“每句不超过 15 字”，但平均句长目标写的是 15–25 字，两者冲突；句长指标当前只能做相对比较。
+注意：v3 已撤销平均句长目标，句长只保留为诊断。v3 使用 typed slot 归一化风格指标，并用原始输出对事实表做 claim 级幻觉校验；当前目标以 [V3_RESCORE.md](eval_results/V3_RESCORE.md) 为准。
 
 #### 流畅度
 
@@ -195,7 +222,7 @@ python -m mlx_lm.fuse \
 
 旧版“KTO 全面胜出”的对比表已删除。原因是 README 旧“DPO”列实际来自 SFT v7、KTO 旧权重与基座一致、KTO 指标跨报告拼接、样本量和 prompt 不一致。
 
-2026-11-25 用协议 v2 重跑八个模型（30 条，`max_tokens=300`，Qwen chat template；六个 Qwen2.5 加 Qwen3.5-4B/9B）：
+2026-11-25 用协议 v2 生成八个模型（30 条，`max_tokens=300`，Qwen chat template；六个 Qwen2.5 加 Qwen3.5-4B/9B）。下表是历史 v2 口径：
 
 | 模型 | 目标命中 | 主要问题 |
 |---|---:|---|
@@ -208,7 +235,9 @@ python -m mlx_lm.fuse \
 | qwen3.5-4b | 4/9 | 互动 0.392 达标；卖点 0.733、幻觉 0.152、结构 3.200 |
 | qwen3.5-9b | 4/9 | 互动 0.483 最好；但卖点 0.728、幻觉 0.281 |
 
-**结论**：base-7b 仍是当前最强基线；Qwen3.5-4B/9B 没有超过它。3B 偏好优化相对 base-3b 只多命中 1 项，不能证明方法有效。没有模型达到 6/9 以上，结构完整度、情绪递进和幻觉是共同短板。旧 8/8 与 2026-11-24 的 180-token 结果均不可复现。详细数字和 caveat 见 `eval_results/V2_RESULTS.md`，完整审计见 [AUDIT.md](AUDIT.md)。
+**历史 v2 结论**：在该口径下 base-7b 5/9 最高；Qwen3.5-4B/9B 都是 4/9。3B 偏好优化相对 base-3b 只多命中 1 项，不能证明方法有效。旧 8/8 与 2026-11-24 的 180-token 结果均不可复现。详细数字和 caveat 见 `eval_results/V2_RESULTS.md`，完整审计见 [AUDIT.md](AUDIT.md)。
+
+**v3 当前结论（2026-11-26）**：Qwen3.5-4B SFT-v4 **8/8**，幻觉率 `0.011`（seed 1 为 `0.000`）、结构覆盖 `0.987`；Qwen3.5-4B/9B 基线均为 6/8。SFT 的句级唯一率只有 46.3%、两两相似度 0.582，模板化仍是主要质量风险。事实一致性问题在基线中集中在编价格、编库存和泛化逼单。详见 [V3_SFT_V4_RESULTS.md](eval_results/V3_SFT_V4_RESULTS.md)。
 
 ---
 
@@ -217,10 +246,12 @@ python -m mlx_lm.fuse \
 | 任务 | 模型大小 | 可行性 |
 |------|---------|--------|
 | QLoRA SFT | 7B | ⭐⭐⭐⭐⭐ 非常舒服 |
+| Qwen3.5-4B LoRA SFT | 4B | ⭐⭐⭐⭐⭐ batch 1 峰值 12.7GB |
+| Qwen3.5-9B 推理 | 9B | ⚠️ 约 17GB，接近 24GB 上限且较慢 |
 | QLoRA SFT | 14B | ❌ 内存不够 |
-| KTO | 3B | ✅ 已重训并完成 v2 评估（4/9） |
-| IPO | 3B | ✅ 已重训并完成 v2 评估（4/9） |
-| DPO | 3B | ✅ 已训练并完成 v2 评估（4/9） |
+| KTO | 3B | ✅ 已重训；v3 离线重算 4/8 |
+| IPO | 3B | ✅ 已重训；v3 离线重算 4/8 |
+| DPO | 3B | ✅ 已训练；v3 离线重算 4/8 |
 | PPO | 任何 | ❌ 内存爆炸 |
 
 ---
@@ -233,8 +264,10 @@ python -m mlx_lm.fuse \
 conda activate mlx
 
 python -m mlx_lm generate \
-    --model /Users/xiaoxiao/work/finetuning/livestream-bot/fused_model/livestream-7b-sft \
-    --prompt "产品：充电宝；卖点：20000mAh、快充、轻便；生成1分钟话术" \
+    --model /Users/xiaoxiao/work/finetuning/models/Qwen3.5-4B \
+    --adapter-path ./adapters/qwen3.5-4b-sft-v4 \
+    --system-prompt "你是一位抖音直播带货话术专家。价格、数量、库存、时间、优惠等具体信息只能来自用户输入。" \
+    --prompt "产品：充电宝；卖点：20000mAh、快充、轻便；时长：1分钟；价格：99元" \
     --max-tokens 300 \
     --temp 0.7 \
     --top-p 0.9
@@ -243,14 +276,17 @@ python -m mlx_lm generate \
 ### 评估模型
 
 ```bash
-# 评估单个模型（协议 v2）
+# 评估单个模型（协议 v3）
 python scripts/eval_pipeline.py \
     --model Qwen/Qwen2.5-3B-Instruct \
     --name "base-3b" \
     --samples 30 \
     --save
 
-# 对比多个 v2 报告
+# 对比多个 v3 报告
 python scripts/eval_pipeline.py \
-    --compare eval_results/eval_v2_*.json
+    --compare eval_results/eval_v3_rescore_*_20261126_152359.json
+
+# 对已有 v2 输出做 v3 离线重算
+python scripts/rescore_v3.py
 ```

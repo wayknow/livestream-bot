@@ -3,7 +3,7 @@
 > 本地微调实战总结（基于之前数字人直播和文案风格微调经验）
 > 硬件：Mac Mini M4, 24GB Unified Memory
 
-> **审计提示（2026-11-25）**：本报告记录的是 2026-08-28 的 SFT/DPO 阶段，保留为历史材料。后续文档里的 KTO 8/8 结论已撤销；旧 KTO/IPO 训练未生效；2026-11-24 的 180-token 结果也已作废。当前状态和证据见 [AUDIT.md](AUDIT.md)、[STATUS.md](STATUS.md) 与 [V2_RESULTS.md](eval_results/V2_RESULTS.md)。
+> **审计提示（2026-11-26）**：本报告记录的是 2026-08-28 的 SFT/DPO 阶段，保留为历史材料。旧 KTO/IPO 训练未生效，旧 8/8 和 180-token 结果均已作废。当前主线是 Qwen3.5-4B SFT-v4：v3 自动指标 8/8，但模板化仍重；证据见 [V3_SFT_V4_RESULTS.md](eval_results/V3_SFT_V4_RESULTS.md)。
 
 ---
 
@@ -239,3 +239,13 @@ livestream-bot/
 | qwen3.5-9b | 4/9 | 互动 0.483 最好；但卖点 0.728、幻觉 0.281 |
 
 当前可信结论：训练链路真实，但生成质量没有达到目标。base-7b 5/9 仍是当前最好；Qwen3.5-4B/9B 都是 4/9，没有解决幻觉和卖点覆盖问题；SFT-7b 4/9 低于对应基座；3B 偏好优化均为 4/9，只能证明相对 base-3b 多命中 1 项，不能证明方法稳定有效。所有模型都未达到 6/9。详细数据见 `eval_results/V2_RESULTS.md`。
+
+## 十、2026-11-26 更新
+
+后续修复了 v3 评估的小数价格、discourse number、条件结构和 claim 匹配问题，并在 Qwen3.5-4B 上用 600+120 条事实一致、产品级切分的 SFT-v4 数据训练 LoRA。同一 benchmark、v3 prompt 和生成参数下：
+
+- base 4B：6/8，结构 0.588、幻觉 0.539。
+- SFT-v4：8/8，结构 0.987、幻觉 0.011；seed 1 幻觉 0.000。
+- 9B base：6/8，结构 0.657、幻觉 0.611。
+
+这是当前可复现的自动指标结果，但 SFT 的句级唯一率只有 46.3%、两两相似度 0.582，说明模板塌缩明显，不能据此宣称生产可用。详见 [eval_results/V3_SFT_V4_RESULTS.md](eval_results/V3_SFT_V4_RESULTS.md)。

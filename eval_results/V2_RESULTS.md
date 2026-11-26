@@ -1,5 +1,7 @@
 # Protocol v2 results (2026-11-25)
 
+> **Superseded for target conclusions by protocol v3.** The v2 average-sentence-length target was withdrawn, selling-point coverage used exact string matching, and hallucination only checked numbers. Use this file for v2 generation provenance; current conclusions are in [`V3_RESCORE.md`](V3_RESCORE.md).
+
 ## Scope
 
 - Benchmark: `data/benchmark_prompts.jsonl` (30 prompts)

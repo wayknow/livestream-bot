@@ -1,0 +1,2441 @@
+{
+  "model_name": "sft-7b",
+  "timestamp": "2026-11-26T15:24:00.083643",
+  "metric_version": "3.0",
+  "prompt_version": "livestream-v2",
+  "system_prompt": "你是一位抖音直播带货话术专家。你的风格特征：\n①短句为主，每句不超过15字\n②每3句话插入一次互动指令（\"扣1\"、\"对不对\"、\"听我说\"）\n③先讲痛点场景，再给解决方案，最后价格逼单\n④情绪递进：平静→兴奋→急促\n⑤口头禅：家人们、真的绝了、最后一波、听我说、有没有\n⑥价格、数量、时间等具体信息只能来自用户输入；用户没给就不要编造。",
+  "model_path": "Qwen/Qwen2.5-7B-Instruct",
+  "adapter_path": "adapters/sft-7b",
+  "judge_model": null,
+  "generation_params": {
+    "max_tokens": 300,
+    "temp": 0.7,
+    "top_p": 0.9
+  },
+  "git_commit": "877d8be092f8a7efd70fbe0dabb23439e3f86edb",
+  "git_dirty": true,
+  "evaluator_sha256": "5e18dd55ece65be50c49373d306a0a8adc7d50c94c60045d0f3f2d67c06a07e5",
+  "benchmark_size": 30,
+  "benchmark_sha256": "284715c91661e1b32ee0d26d144ed3f30760f2ce849991c3ec85f47de7c8f246",
+  "targets": {
+    "interactive_sentence_ratio": {
+      "label": "互动句占比",
+      "lower": 0.3,
+      "upper": 0.6
+    },
+    "spoken_ratio": {
+      "label": "口语词占比",
+      "lower": 0.02
+    },
+    "structure_coverage": {
+      "label": "结构覆盖(必需模块)",
+      "lower": 0.75
+    },
+    "selling_point_coverage": {
+      "label": "卖点覆盖率",
+      "lower": 0.8
+    },
+    "hallucination_rate": {
+      "label": "幻觉率",
+      "upper": 0.1
+    },
+    "emotion_progression": {
+      "label": "情绪递进(0-5)",
+      "lower": 3.5,
+      "min_pass_rate": 0.7
+    },
+    "catchphrase_repeat": {
+      "label": "口头禅重复度",
+      "upper": 0.3
+    },
+    "fluency_score": {
+      "label": "流畅度(0-5)",
+      "lower": 3.5
+    }
+  },
+  "target_checks": {
+    "interactive_sentence_ratio": true,
+    "spoken_ratio": true,
+    "structure_coverage": false,
+    "selling_point_coverage": false,
+    "hallucination_rate": false,
+    "emotion_progression": false,
+    "catchphrase_repeat": true,
+    "fluency_score": true
+  },
+  "sample_results": [
+    {
+      "benchmark_id": "B001",
+      "category": "美妆",
+      "scene": "开场暖场",
+      "prompt": "产品：口红；卖点：显白、不拔干；时长：1分钟",
+      "facts": {
+        "product": "口红",
+        "selling_points": [
+          "显白",
+          "不拔干"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有妆花成二维码？是不是特别烦？我懂！有没有同感的？日常通勤太崩溃了！来！刷个爱心！！直到遇到这个口红！显白两个字！不拔干！有没有化妆师？用对产品真的不一样！所有口红，扣1！！对比一下！自己会惊了！今天只要79！所有口红，扣个666！！真的绝绝子！听我说！有没有学生党？卖完就没了！有没有学生党？扣个1让我看看！！库存不多了！3、2、1！上链接！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.37,
+        "avg_sentence_len": 6.6,
+        "spoken_ratio": 0.0449,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "79"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "79",
+            "unit": "",
+            "surface": "79",
+            "context": "下自己会惊了今天只要79所有口红扣个666真",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "卖完就没了",
+            "context": "卖完就没了",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 5.0,
+        "catchphrase_repeat": 0.037,
+        "sentence_count": 27,
+        "char_count": 178,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/27 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B002",
+      "category": "美妆",
+      "scene": "逼单成交",
+      "prompt": "产品：面膜；卖点：急救补水、玻尿酸；时长：30秒；强调最后10单",
+      "facts": {
+        "product": "面膜",
+        "selling_points": [
+          "急救补水",
+          "玻尿酸"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 10,
+        "stock_unit": "单",
+        "promotion": [
+          "最后10单"
+        ]
+      },
+      "output": "姐妹们！对不对妆花成二维码？是不是特别烦？我懂！所有女生，扣1！！日常保养的时候真的崩溃！直到遇到这个面膜！急救补水！玻尿酸！有没有熬夜党？扣个1让我看看！！用完你会谢我！现在只要49！来！熬夜党给我刷个爱心！！比专柜便宜一半！送贴片！有没有学生党？扣个1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.381,
+        "avg_sentence_len": 6.9,
+        "spoken_ratio": 0.0069,
+        "structure_coverage": 0.25,
+        "structure_completeness": 1.2,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "49"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "49",
+            "unit": "",
+            "surface": "49",
+            "context": "用完你会谢我现在只要49来熬夜党给我刷个爱心",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 21,
+        "char_count": 145,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/21 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B003",
+      "category": "美妆",
+      "scene": "痛点切入",
+      "prompt": "产品：防晒霜；卖点：SPF50+、3秒成膜、不油腻；时长：2分钟；目标人群：油皮女生",
+      "facts": {
+        "product": "防晒霜",
+        "selling_points": [
+          "SPF50+",
+          "3秒成膜",
+          "不油腻"
+        ],
+        "duration": "2分钟",
+        "audience": "油皮女生",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "你们用过防晒霜吗？夏天脸反光对不对？是不是？今天这个不一样！SPF50+！有没有油皮女生？扣个666让我看看！！吊打市面产品！3秒成膜！油皮姐妹在哪里？给我刷个爱心！！真的绝了！不油腻！油皮姐妹的姐妹扣个1！！现在只要79！有没有油皮女生？刷个爱心让我看看！！比专柜便宜一半！送同款小样！油皮姐妹在哪里？给我疯狂扣1！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.348,
+        "avg_sentence_len": 7.4,
+        "spoken_ratio": 0.0234,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "claim_count": 3,
+        "claim_support_rate": 0.667,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "79"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "79",
+            "unit": "",
+            "surface": "79",
+            "context": "的姐妹扣个1现在只要79有没有油皮女生刷个爱",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.4,
+        "catchphrase_repeat": 0.043,
+        "sentence_count": 23,
+        "char_count": 171,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B004",
+      "category": "美妆",
+      "scene": "成分科普",
+      "prompt": "产品：抗皱面霜；卖点：玻色因、7天淡纹；时长：1分钟；专业科普风格",
+      "facts": {
+        "product": "抗皱面霜",
+        "selling_points": [
+          "玻色因",
+          "7天淡纹"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "你们用过抗皱面霜吗？眼角纹能夹死蚊子对不对？是不是？今天这个不一样！玻色因！7天淡纹！有没有护肤党？给我刷个赞！！吊打市面产品！别人卖399！同款的姐妹刷个爱心！！我们只要168！送精华小样！来！护肤党给我刷个赞！！性价比之王！不买亏了！所有护肤党，给我刷个赞！！有同感的扣1！对比一下！真的不一样！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.19,
+        "avg_sentence_len": 7.1,
+        "spoken_ratio": 0.0133,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "168",
+          "399"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "spec",
+            "value": "399",
+            "unit": "",
+            "surface": "399",
+            "context": "赞吊打市面产品别人卖399同款的姐妹刷个爱心我",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "price",
+            "value": "168",
+            "unit": "",
+            "surface": "168",
+            "context": "姐妹刷个爱心我们只要168送精华小样来护肤党给",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.4,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 21,
+        "char_count": 150,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/21 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B005",
+      "category": "美妆",
+      "scene": "对比种草",
+      "prompt": "产品：粉底液；卖点：持妆12小时、不卡粉；时长：1分钟；对比其他品牌",
+      "facts": {
+        "product": "粉底液",
+        "selling_points": [
+          "持妆12小时",
+          "不卡粉"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！对不对妆花成二维码？是不是特别烦？我懂！有没有同感的？日常通勤的时候真的崩溃！直到遇到这个粉底液！来！家人们给我刷个赞！！真的好用到哭！持妆12小时！有没有化妆界的姐妹？刷个爱心让我看看！！用完你会谢我！现在只要79！有没有颜值党？给我刷个赞让我看看！！比专柜便宜一半！送同款小样！有没有颜值党？疯狂扣1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.478,
+        "avg_sentence_len": 7.5,
+        "spoken_ratio": 0.0173,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "79"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "79",
+            "unit": "",
+            "surface": "79",
+            "context": "用完你会谢我现在只要79有没有颜值党给我刷个",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.043,
+        "sentence_count": 23,
+        "char_count": 173,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B006",
+      "category": "数码",
+      "scene": "开场暖场",
+      "prompt": "产品：蓝牙耳机；卖点：主动降噪、续航30小时；时长：1分钟",
+      "facts": {
+        "product": "蓝牙耳机",
+        "selling_points": [
+          "主动降噪",
+          "续航30小时"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有健身房总掉？是不是特别烦？我懂！通勤地铁的时候真的崩溃！所有同感的？扣个666让我看看！！送长辈的时候真的崩溃！直到遇到这个蓝牙耳机！来！有没有同感的？扣个1让我看看！！真的好用到哭！主动降噪！所有干皮姐妹扣个1！！用完你会谢我！现在只要99！同感的扣1！！比专柜便宜一半！送长辈绝了！有没有同感的？扣个1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.417,
+        "avg_sentence_len": 7.4,
+        "spoken_ratio": 0.0339,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.5,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99同感的扣1比专柜便宜",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 177,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B007",
+      "category": "数码",
+      "scene": "逼单成交",
+      "prompt": "产品：充电宝；卖点：20000mAh、快充、轻便；时长：30秒；强调限时优惠",
+      "facts": {
+        "product": "充电宝",
+        "selling_points": [
+          "20000mAh",
+          "快充",
+          "轻便"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "限时优惠"
+        ]
+      },
+      "output": "姐妹们！有没有手机没电？是不是特别烦？我懂！有没有同感的？户外徒步没用对不对？是不是？今天这个充电宝绝了！20000mAh大容量！所有女孩扣个1！！能有效解决！快充设计！轻便好携带！来！所有女孩给我刷个赞！！用完你会谢我！现在只要99！有没有女孩？扣个1让我看看！！一定要试试！不试后悔！有没有同感的？对比一下！真的不一样！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.417,
+        "avg_sentence_len": 6.8,
+        "spoken_ratio": 0.0185,
+        "structure_coverage": 0.6,
+        "structure_completeness": 3.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案",
+          "价格锚定"
+        ],
+        "structure_missing": [
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99有没有女孩扣个1让我",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 24,
+        "char_count": 162,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B008",
+      "category": "数码",
+      "scene": "痛点切入",
+      "prompt": "产品：手机壳；卖点：防摔、颜值高、无线充电兼容；时长：1分钟",
+      "facts": {
+        "product": "手机壳",
+        "selling_points": [
+          "防摔",
+          "颜值高",
+          "无线充电兼容"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有手机掉地上？是不是特别烦？我懂！有没有女生？扣个666让我看看！！送长辈的时候真的崩溃！直到遇到这个手机壳！所有女生，给我刷个赞！！真的好用到哭！防摔、颜值高！有没有同感的？扣个666让我看看！！用完你会谢我！现在只要39.9！有没有学生党？给我刷个赞！！比专柜便宜一半！送膜！所有女生，刷个爱心！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.364,
+        "avg_sentence_len": 7.6,
+        "spoken_ratio": 0.0179,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "用完你会谢我现在只要39.9有没有学生党给我刷个",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.045,
+        "sentence_count": 22,
+        "char_count": 168,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/22 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B009",
+      "category": "数码",
+      "scene": "场景种草",
+      "prompt": "产品：智能手表；卖点：心率监测、运动模式、7天续航；时长：2分钟；健身党",
+      "facts": {
+        "product": "智能手表",
+        "selling_points": [
+          "心率监测",
+          "运动模式",
+          "7天续航"
+        ],
+        "duration": "2分钟",
+        "audience": "健身党",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "划重点！为什么健身房总掉？知道吗？健身房没用对产品！所有健身党，刷个爱心！！今天这个智能手表！心率监测！运动模式！7天续航！来！健身党给我刷个爱心！！真的绝了！划重点！健身房党的姐妹扣个1！！现在只要99！有没有健身党？扣1让我看看！！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.15,
+        "avg_sentence_len": 6.7,
+        "spoken_ratio": 0.0299,
+        "structure_coverage": 0.0,
+        "structure_completeness": 0.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [],
+        "structure_missing": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 0.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "的姐妹扣个1现在只要99有没有健身党扣1让我",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.4,
+        "catchphrase_repeat": 0.05,
+        "sentence_count": 20,
+        "char_count": 134,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/20 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B010",
+      "category": "数码",
+      "scene": "对比种草",
+      "prompt": "产品：机械键盘；卖点：热插拔、RGB灯效、静音轴；时长：1分钟；对比薄膜键盘",
+      "facts": {
+        "product": "机械键盘",
+        "selling_points": [
+          "热插拔",
+          "RGB灯效",
+          "静音轴"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有打字发抖？是不是特别烦？我懂！来！打个call让我看看同感的！！送礼的时候真的崩溃！直到遇到这个机械键盘！所有打字妹纸，给我刷个赞！！真的好用到哭！热插拔！薄膜键盘的同感？刷个爱心让我看看！！用完你会谢我！现在只要99！来！打字妹纸给我刷个1！！比专柜便宜一半！送膜！有没有打字妹纸？扣个666让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.304,
+        "avg_sentence_len": 7.4,
+        "spoken_ratio": 0.0175,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99来打字妹纸给我刷个1",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.043,
+        "sentence_count": 23,
+        "char_count": 171,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B011",
+      "category": "食品",
+      "scene": "开场暖场",
+      "prompt": "产品：零食大礼包；卖点：10袋装、网红爆款、独立包装；时长：1分钟",
+      "facts": {
+        "product": "零食大礼包",
+        "selling_points": [
+          "10袋装",
+          "网红爆款",
+          "独立包装"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有追剧没零食？是不是特别烦？我懂！所有女生，给我刷个赞！！追剧的时候真的崩溃！直到遇到这个零食大礼包！来！刷个爱心！！真的好用到哭！10袋装！是不是特别烦？追剧的时候有救了！有没有追剧党？刷个爱心让我看看！！现在只要39.9！网红爆款！有没有追剧党？疯狂扣1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.381,
+        "avg_sentence_len": 7.2,
+        "spoken_ratio": 0.0263,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "爱心让我看看现在只要39.9网红爆款有没有追剧党",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.048,
+        "sentence_count": 21,
+        "char_count": 152,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/21 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B012",
+      "category": "食品",
+      "scene": "逼单成交",
+      "prompt": "产品：螺蛳粉；卖点：正宗柳州味、料足、3分钟速食；时长：30秒；最后50单",
+      "facts": {
+        "product": "螺蛳粉",
+        "selling_points": [
+          "正宗柳州味",
+          "料足",
+          "3分钟速食"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 50,
+        "stock_unit": "单",
+        "promotion": [
+          "最后50单"
+        ]
+      },
+      "output": "来！家人们！有同感的办公室下午茶？对不对？追剧没零食？是不是？真的崩溃？我懂！有没有螺蛳粉爱好者？扣个666让我看看！！直到遇到柳州螺蛳粉！正宗柳州味！有没有螺蛳粉爱好者？刷个爱心让我看看！！真的好用到哭！料足！3分钟速食！来！螺蛳粉爱好者给我刷个赞！！今天只要39.9！再送2袋！有没有螺蛳粉爱好者？扣个1让我看看！！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.346,
+        "avg_sentence_len": 6.8,
+        "spoken_ratio": 0.017,
+        "structure_coverage": 0.25,
+        "structure_completeness": 1.2,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "2",
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "者给我刷个赞今天只要39.9再送2袋有没有螺蛳粉",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "spec",
+            "value": "2",
+            "unit": "袋",
+            "surface": "2袋",
+            "context": "今天只要39.9再送2袋有没有螺蛳粉爱好者扣",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 1.2,
+        "catchphrase_repeat": 0.038,
+        "sentence_count": 26,
+        "char_count": 176,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/26 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B013",
+      "category": "食品",
+      "scene": "痛点切入",
+      "prompt": "产品：代餐奶昔；卖点：低卡、饱腹感强、6种口味；时长：1分钟；减肥党",
+      "facts": {
+        "product": "代餐奶昔",
+        "selling_points": [
+          "低卡",
+          "饱腹感强",
+          "6种口味"
+        ],
+        "duration": "1分钟",
+        "audience": "减肥党",
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "划重点！为什么健身房总掉队？知道吗？健身没用对产品！所有减肥党，扣个666！！今天这个代餐奶昔！低卡！减肥党的姐妹疯狂扣1！！能有效解决！知识点来了！有没有健身党？疯狂扣1让我看看！！现在只要49.9！送2罐！来！减肥党给我刷个赞！！记住了！这个值得囤！听懂的扣1！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.211,
+        "avg_sentence_len": 7.0,
+        "spoken_ratio": 0.015,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "解决方案"
+        ],
+        "structure_missing": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "2",
+          "49.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "49.9",
+            "unit": "",
+            "surface": "49.9",
+            "context": "扣1让我看看现在只要49.9送2罐来减肥党给我刷",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "spec",
+            "value": "2",
+            "unit": "罐",
+            "surface": "2罐",
+            "context": "看现在只要49.9送2罐来减肥党给我刷个赞记",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.2,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 19,
+        "char_count": 133,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/19 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B014",
+      "category": "食品",
+      "scene": "场景种草",
+      "prompt": "产品：坚果礼盒；卖点：每日一袋、7种坚果、无添加；时长：1分钟；送礼场景",
+      "facts": {
+        "product": "坚果礼盒",
+        "selling_points": [
+          "每日一袋",
+          "7种坚果",
+          "无添加"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有办公室下午茶？对不对？嘴馋没零食？是不是特别烦？我懂！有没有熬夜党？追剧没零食？是不是特别烦？我懂！送长辈最怕这个了！来！送长辈最怕的举手！！有同感的扣1！！直到遇到这个坚果礼盒！所有送礼场景的姐妹扣个1！！真的好用到哭！7种坚果！无添加！有没有办公室党？对不对？有没有同感的？扣个1让我看看！！今天只要59.9！有没有办公室党？对不对？扣1让我看看！！而且有3盒装！有没有办公室党？对不对？有没有同感的？扣个1让我看看！！库存不多了！3、2、1！上链接！！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.543,
+        "avg_sentence_len": 6.7,
+        "spoken_ratio": 0.0169,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "行动指令"
+        ],
+        "structure_missing": [
+          "解决方案"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.5,
+        "claim_count": 4,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "59.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "59.9",
+            "unit": "",
+            "surface": "59.9",
+            "context": "个1让我看看今天只要59.9有没有办公室党对不对",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "stock",
+            "value": "generic",
+            "unit": "",
+            "surface": "库存不多",
+            "context": "库存不多",
+            "status": "unsupported",
+            "reason": "stock_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 4.1,
+        "catchphrase_repeat": 0.029,
+        "sentence_count": 35,
+        "char_count": 236,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/35 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B015",
+      "category": "食品",
+      "scene": "对比种草",
+      "prompt": "产品：酸奶；卖点：0蔗糖、高蛋白、活菌；时长：1分钟；对比普通酸奶",
+      "facts": {
+        "product": "酸奶",
+        "selling_points": [
+          "0蔗糖",
+          "高蛋白",
+          "活菌"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有口腔溃疡？是不是特别烦？我懂！是不是？所有女生，给我刷个赞！！日常喝酸奶根本不管用！真的崩溃！有没有同感的？送长辈太尴尬了！所有女生，疯狂刷个爱心！！直到遇到这个0蔗糖酸奶！0蔗糖！有没有口臭的？尴尬对不对？来！懂得给我刷个赞！！用了一周就惊了！高蛋白！是不是口臭星人？试试同感的？刷个爱心让我看看！！今天只要39.9！送2瓶！有没有口臭的？扣个666让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.393,
+        "avg_sentence_len": 7.1,
+        "spoken_ratio": 0.02,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "2",
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "爱心让我看看今天只要39.9送2瓶有没有口臭的扣",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "spec",
+            "value": "2",
+            "unit": "瓶",
+            "surface": "2瓶",
+            "context": "看今天只要39.9送2瓶有没有口臭的扣个66",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 1.2,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 28,
+        "char_count": 200,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/28 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B016",
+      "category": "家居",
+      "scene": "开场暖场",
+      "prompt": "产品：收纳盒；卖点：多层分类、透明可视、可折叠；时长：1分钟",
+      "facts": {
+        "product": "收纳盒",
+        "selling_points": [
+          "多层分类",
+          "透明可视",
+          "可折叠"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有桌面乱成狗窝？是不是特别烦？我懂！有没有同感的？文具收纳太烦了！来！疯狂扣1让我看看！！直到遇到这个收纳盒！多层分类！是不是？疯狂扣1让我看看！！用了一周就惊了！透明可视！有没有桌面党？扣个1让我看看！！今天只要39.9！有没有桌面党？扣个1让我看看！！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.5,
+        "avg_sentence_len": 6.8,
+        "spoken_ratio": 0.02,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "个1让我看看今天只要39.9有没有桌面党扣个1让",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 22,
+        "char_count": 150,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/22 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B017",
+      "category": "家居",
+      "scene": "逼单成交",
+      "prompt": "产品：洗衣液；卖点：亮白增艳、99%除菌、母婴适用；时长：30秒；买2送1",
+      "facts": {
+        "product": "洗衣液",
+        "selling_points": [
+          "亮白增艳",
+          "99%除菌",
+          "母婴适用"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "买2送1"
+        ]
+      },
+      "output": "姐妹们！有没有泡沫难漂净？是不是特别烦？我懂！所有女生，给我刷个赞！！日常洗衣的时候真的崩溃！直到遇到这个洗衣液！来！所有女生给我刷个爱心！！真的好用到哭！亮白增艳！99%除菌！母婴适用！所有女生，给我刷个赞！！用完你会谢我！现在只要39.9！买2送1！所有女生，疯狂扣1！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.2,
+        "avg_sentence_len": 7.5,
+        "spoken_ratio": 0.0201,
+        "structure_coverage": 0.5,
+        "structure_completeness": 2.5,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "价格锚定"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.333,
+        "claim_count": 3,
+        "claim_support_rate": 0.667,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "39.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "39.9",
+            "unit": "",
+            "surface": "39.9",
+            "context": "用完你会谢我现在只要39.9买2送1所有女生疯狂",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.05,
+        "sentence_count": 20,
+        "char_count": 149,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/20 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B018",
+      "category": "家居",
+      "scene": "痛点切入",
+      "prompt": "产品：保温杯；卖点：12小时保温、防漏、316不锈钢；时长：1分钟；办公室场景",
+      "facts": {
+        "product": "保温杯",
+        "selling_points": [
+          "12小时保温",
+          "防漏",
+          "316不锈钢"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！同款的杯子有异味的？是不是特别烦？我懂！有没有办公室党？扣个666让我看看！！送长辈的时候真的崩溃！直到遇到这个保温杯！来！办公室党给我扣个666！！真的好用到哭！12小时保温！有没有办公室党？刷个爱心让我看看！！用完你会谢我！现在只要69！有没有办公室党？刷个爱心让我看看！！比专柜便宜一半！送长辈绝了！来！办公室党给我给我刷个赞！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.333,
+        "avg_sentence_len": 7.6,
+        "spoken_ratio": 0.0273,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 0.5,
+        "claim_count": 2,
+        "claim_support_rate": 0.5,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "69"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "69",
+            "unit": "",
+            "surface": "69",
+            "context": "用完你会谢我现在只要69有没有办公室党刷个爱",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 183,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B019",
+      "category": "家居",
+      "scene": "场景种草",
+      "prompt": "产品：香薰机；卖点：静音、定时、氛围灯；时长：1分钟；助眠场景",
+      "facts": {
+        "product": "香薰机",
+        "selling_points": [
+          "静音",
+          "定时",
+          "氛围灯"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有被同居的打呼声惊醒？是不是特别烦？我懂！有没有同感的？文末评论扣1！！日常199！有没有同感的？送油条！同居的真的崩溃！有没有同感的？文末扣1让我看看！！直到遇到这个香薰机！静音！有没有同感的？扣1让我看看！！用了一周就惊了！我自己囤了3个！同居的真的绝了！有没有同感的？扣1让我看看！！今天只要99！送油条！有没有同感的？扣1让我试试！！一定要试试！不骗你们！亲测有效！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.5,
+        "avg_sentence_len": 6.9,
+        "spoken_ratio": 0.0415,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "扣1让我看看今天只要99送油条有没有同感的扣",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 1.6,
+        "catchphrase_repeat": 0.036,
+        "sentence_count": 28,
+        "char_count": 193,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/28 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B020",
+      "category": "家居",
+      "scene": "对比种草",
+      "prompt": "产品：电动牙刷；卖点：声波震动、5种模式、30天续航；时长：1分钟；对比手动牙刷",
+      "facts": {
+        "product": "电动牙刷",
+        "selling_points": [
+          "声波震动",
+          "5种模式",
+          "30天续航"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有牙齿泛黄？是不是特别烦？我懂！有没有熬夜党？刷牙1分钟都嫌长？对不对？送礼的时候真的崩溃！来！熬夜党给我刷个爱心！！直到遇到这个电动牙刷！声波震动！5种模式！30天续航！所有熬夜党，刷个1！！真的好用到哭！所有熬夜党，扣个666！！用完你会谢我！现在只要99！有没有熬夜党？扣1让我看看！！比专柜便宜一半！送4个刷头！有没有熬夜党？扣个666！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.296,
+        "avg_sentence_len": 7.1,
+        "spoken_ratio": 0.0157,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.667,
+        "claim_count": 3,
+        "claim_support_rate": 0.333,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "4",
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99有没有熬夜党扣1让我",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "spec",
+            "value": "4",
+            "unit": "个",
+            "surface": "4个",
+            "context": "看看比专柜便宜一半送4个刷头有没有熬夜党扣个",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.037,
+        "sentence_count": 27,
+        "char_count": 191,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/27 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B021",
+      "category": "服饰",
+      "scene": "开场暖场",
+      "prompt": "产品：防晒衣；卖点：UPF50+、透气、便携；时长：1分钟",
+      "facts": {
+        "product": "防晒衣",
+        "selling_points": [
+          "UPF50+",
+          "透气",
+          "便携"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有妆花成二维码？是不是特别烦？我懂！所有女生，给我刷个赞！！通勤路上的时候真的崩溃！直到遇到这个防晒衣！来！所有女生给我刷个爱心！！真的好用到哭！UPF50+！透气！有没有户外党？刷个1让我看看！！用完你会谢我！现在只要79！有没有防晒衣？扣个666让我看看！！比专柜便宜一半！送同款帽子！有没有颜值党？刷个1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.375,
+        "avg_sentence_len": 7.4,
+        "spoken_ratio": 0.0169,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.333,
+        "claim_count": 3,
+        "claim_support_rate": 0.667,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "79"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "79",
+            "unit": "",
+            "surface": "79",
+            "context": "用完你会谢我现在只要79有没有防晒衣扣个66",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 178,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B022",
+      "category": "服饰",
+      "scene": "逼单成交",
+      "prompt": "产品：运动裤；卖点：速干、弹力、显瘦；时长：30秒；最后30件",
+      "facts": {
+        "product": "运动裤",
+        "selling_points": [
+          "速干",
+          "弹力",
+          "显瘦"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": 30,
+        "stock_unit": "件",
+        "promotion": [
+          "最后30件"
+        ]
+      },
+      "output": "姐妹们！有没有健身的时候？是不是特别烦？我懂！所有健身党，刷个爱心！！视频会议的时候真的崩溃！直到遇到这个运动裤！所有健身党，刷个爱心！！真的好用到哭！速干、弹力、显瘦！来！健身党给我刷个爱心！！用完你会谢我！现在只要69！来！健身党给我给我刷个赞！！比专柜便宜一半！送同款T恤！所有健身党，刷个1！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.143,
+        "avg_sentence_len": 7.7,
+        "spoken_ratio": 0.0185,
+        "structure_coverage": 0.25,
+        "structure_completeness": 1.2,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令",
+          "限时福利"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "69"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "69",
+            "unit": "",
+            "surface": "69",
+            "context": "用完你会谢我现在只要69来健身党给我给我刷个",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.048,
+        "sentence_count": 21,
+        "char_count": 162,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/21 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B023",
+      "category": "服饰",
+      "scene": "痛点切入",
+      "prompt": "产品：内衣；卖点：无钢圈、聚拢、透气；时长：1分钟；大胸显小",
+      "facts": {
+        "product": "内衣",
+        "selling_points": [
+          "无钢圈",
+          "聚拢",
+          "透气"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有内衣外漏？是不是特别烦？我懂！有没有大胸姐妹？扣个666让我看看！！日常通勤真的崩溃！直到遇到这个内衣！所有大胸姐妹，刷个爱心！！真的好用到哭！无钢圈、聚拢！所有大胸姐妹，刷个1！！穿起来透气舒适！所有大胸姐妹，扣个1！！用完你会谢我！现在只要99！来！大胸姐妹给我刷个爱心！！比专柜便宜一半！买2送1！有没有大胸姐妹？扣个1让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.333,
+        "avg_sentence_len": 7.8,
+        "spoken_ratio": 0.016,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "2",
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99来大胸姐妹给我刷个爱",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          },
+          {
+            "kind": "spec",
+            "value": "2",
+            "unit": "",
+            "surface": "2",
+            "context": "爱心比专柜便宜一半买2送1有没有大胸姐妹扣",
+            "status": "unsupported",
+            "reason": "no_fact"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 187,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B024",
+      "category": "服饰",
+      "scene": "场景种草",
+      "prompt": "产品：睡衣套装；卖点：纯棉、亲肤、多色可选；时长：1分钟；居家场景",
+      "facts": {
+        "product": "睡衣套装",
+        "selling_points": [
+          "纯棉",
+          "亲肤",
+          "多色可选"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "你们用过睡衣套装吗？不贴身对不对？是不是？今天这个不一样！纯棉材质！亲肤！有没有同感的？扣个666让我看看！！吊打市面产品！多色可选！有没有熬夜党？疯狂扣1让我看看！！真的绝了！别人卖199！同款的！有没有学生党？疯狂扣1让我看看！！我们只要99！送文胸！有没有干皮姐妹？扣个1让我看看！！性价比之王！不买亏了！有没有颜值党？扣1让我看看！！有同感的扣1！对比一下！真的不一样！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.464,
+        "avg_sentence_len": 6.8,
+        "spoken_ratio": 0.0317,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_missing": [
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99",
+          "199"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "spec",
+            "value": "199",
+            "unit": "",
+            "surface": "199",
+            "context": "我看看真的绝了别人卖199同款的有没有学生党疯",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "扣1让我看看我们只要99送文胸有没有干皮姐妹",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 3.4,
+        "catchphrase_repeat": 0.036,
+        "sentence_count": 28,
+        "char_count": 189,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/28 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B025",
+      "category": "服饰",
+      "scene": "对比种草",
+      "prompt": "产品：牛仔裤；卖点：高腰、弹力、不褪色；时长：1分钟；对比其他品牌",
+      "facts": {
+        "product": "牛仔裤",
+        "selling_points": [
+          "高腰",
+          "弹力",
+          "不褪色"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "来！家人们！有没有腰酸背痛的？对不对？是不是特别烦？我懂！有没有牛仔裤？扣个666让我看看！！今天这个不一样！高腰设计！所有女生，刷个1！！能有效解决！知识点来了！有没有健身党？扣1让我看看！！现在只要99！弹力十足！不褪色！来！健身党给我刷个赞！！比专柜便宜一半！送同款夹带！所有女生，刷个1！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.32,
+        "avg_sentence_len": 6.4,
+        "spoken_ratio": 0.0063,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_missing": [
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "扣1让我看看现在只要99弹力十足不褪色来健身",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.04,
+        "sentence_count": 25,
+        "char_count": 160,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/25 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B026",
+      "category": "母婴",
+      "scene": "开场暖场",
+      "prompt": "产品：婴儿湿巾；卖点：80抽、无酒精、珍珠纹；时长：1分钟",
+      "facts": {
+        "product": "婴儿湿巾",
+        "selling_points": [
+          "80抽",
+          "无酒精",
+          "珍珠纹"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "划重点！为什么婴儿湿巾有异味？知道吗？无效对不对？是不是？今天这个不一样！无酒精！珍珠纹！有没有宝妈？扣个666让我看看！！吊打市面产品！别人卖79！有没有宝爸？扣1让我看看！！我们只要39.9！80抽装！有没有干皮的？扣个666让我看看！！性价比之王！不买亏了！所有宝妈，刷个爱心！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1！！有同感的刷个1",
+      "metrics": {
+        "interactive_sentence_ratio": 0.174,
+        "avg_sentence_len": 8.0,
+        "spoken_ratio": 0.0027,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 1.0,
+        "claim_count": 2,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 2,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "39.980",
+          "79"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "spec",
+            "value": "79",
+            "unit": "",
+            "surface": "79",
+            "context": "看吊打市面产品别人卖79有没有宝爸扣1让我看",
+            "status": "unsupported",
+            "reason": "no_fact"
+          },
+          {
+            "kind": "price",
+            "value": "39.980",
+            "unit": "抽",
+            "surface": "39.980抽",
+            "context": "扣1让我看看我们只要39.980抽有没有干皮的扣个66",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 46,
+        "char_count": 366,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/46 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B027",
+      "category": "母婴",
+      "scene": "逼单成交",
+      "prompt": "产品：儿童水杯；卖点：防漏、Tritan材质、带吸管；时长：30秒；限时半价",
+      "facts": {
+        "product": "儿童水杯",
+        "selling_points": [
+          "防漏",
+          "Tritan材质",
+          "带吸管"
+        ],
+        "duration": "30秒",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": [
+          "限时半价"
+        ]
+      },
+      "output": "姐妹们！有没有杯子漏水？是不是特别烦？我懂！所有家长，刷个爱心！！送长辈的！直到遇到这个儿童水杯！Tritan材质！有没有杯子爱好者？刷个爱心让我看看！！真的好用到哭！防漏！来！杯子爱好者给我刷个爱心！！用完你会谢我！现在半价！有没有家长？刷个爱心让我看看！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.35,
+        "avg_sentence_len": 7.0,
+        "spoken_ratio": 0.0142,
+        "structure_coverage": 0.4,
+        "structure_completeness": 2.0,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_missing": [
+          "行动指令",
+          "价格锚定",
+          "限时福利"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.667,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.05,
+        "sentence_count": 20,
+        "char_count": 141,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/20 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B028",
+      "category": "母婴",
+      "scene": "痛点切入",
+      "prompt": "产品：尿不湿；卖点：超薄、瞬吸、不侧漏；时长：1分钟；新生儿场景",
+      "facts": {
+        "product": "尿不湿",
+        "selling_points": [
+          "超薄",
+          "瞬吸",
+          "不侧漏"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有半夜被哭声惊醒？是不是特别烦？我懂！所有新生儿的妈妈，给我刷个赞！！真的崩溃！直到遇到这个尿不湿！来！新生儿的妈妈给我扣个666！！用完你会谢我！超薄设计！新生儿场景亲测有效！有没有新生儿的妈妈？刷个1让我看看！！用完你会谢我！现在只要69.9！有没有新生儿的妈妈？刷个爱心让我看看！！比专柜便宜一半！送背带！所有新生儿的妈妈扣个1！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.348,
+        "avg_sentence_len": 8.1,
+        "spoken_ratio": 0.0054,
+        "structure_coverage": 0.667,
+        "structure_completeness": 3.3,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景",
+          "解决方案"
+        ],
+        "structure_missing": [
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "69.9"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "69.9",
+            "unit": "",
+            "surface": "69.9",
+            "context": "用完你会谢我现在只要69.9有没有新生儿的妈妈刷",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.0,
+        "catchphrase_repeat": 0.0,
+        "sentence_count": 23,
+        "char_count": 186,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/23 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B029",
+      "category": "母婴",
+      "scene": "场景种草",
+      "prompt": "产品：婴儿推车；卖点：轻便、可折叠、避震；时长：2分钟；出行场景",
+      "facts": {
+        "product": "婴儿推车",
+        "selling_points": [
+          "轻便",
+          "可折叠",
+          "避震"
+        ],
+        "duration": "2分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！有没有推车太重？是不是特别烦？我懂！有没有同感的？郊游太崩溃了！有没有婴儿推车的？对不对？今天这个不一样！轻便！有没有推车党？扣个666让我看看！！真的绝了！可折叠！有没有户外党？扣1让我看看！！最后这个值得买！避震！所有父母都要扣1！！有同感的扣个1！！真的绝绝子！有没有婴儿推车的？对比一下！真的不一样！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.542,
+        "avg_sentence_len": 6.6,
+        "spoken_ratio": 0.057,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 1.0,
+        "hallucination_rate": 0.0,
+        "claim_count": 0,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 0,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [],
+        "unsupported_claims": [],
+        "contradicted_claims": [],
+        "emotion_progression": 3.8,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 158,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    },
+    {
+      "benchmark_id": "B030",
+      "category": "母婴",
+      "scene": "对比种草",
+      "prompt": "产品：辅食机；卖点：蒸煮一体、静音、易清洗；时长：1分钟；对比手动研磨",
+      "facts": {
+        "product": "辅食机",
+        "selling_points": [
+          "蒸煮一体",
+          "静音",
+          "易清洗"
+        ],
+        "duration": "1分钟",
+        "audience": null,
+        "price": null,
+        "original_price": null,
+        "stock": null,
+        "stock_unit": null,
+        "promotion": []
+      },
+      "output": "姐妹们！对不对厨房没同款的？是不是特别烦？我懂！有没有宝妈？扣个666让我看看！！厨房的时候真的崩溃！直到遇到这个辅食机！来！宝妈给我刷个爱心！！真的好用到哭！蒸煮一体！有没有干皮姐妹？刷个1让我看看颜值！！用完你会谢我！现在只要99！有没有油皮姐妹？刷个1让我看看同感！！比手动研磨省时一半！送配件！有没有姐妹？扣个1让我看看同感！！一定要试试！不试后悔！",
+      "metrics": {
+        "interactive_sentence_ratio": 0.458,
+        "avg_sentence_len": 7.5,
+        "spoken_ratio": 0.0168,
+        "structure_coverage": 0.333,
+        "structure_completeness": 1.7,
+        "structure_required": [
+          "痛点场景",
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_required_hits": [
+          "痛点场景"
+        ],
+        "structure_missing": [
+          "解决方案",
+          "行动指令"
+        ],
+        "structure_order_score": 1.0,
+        "selling_point_coverage": 0.333,
+        "hallucination_rate": 1.0,
+        "claim_count": 1,
+        "claim_support_rate": 0.0,
+        "unsupported_claim_count": 1,
+        "contradicted_claim_count": 0,
+        "hallucinated_numbers": [
+          "99"
+        ],
+        "unsupported_claims": [
+          {
+            "kind": "price",
+            "value": "99",
+            "unit": "",
+            "surface": "99",
+            "context": "用完你会谢我现在只要99有没有油皮姐妹刷个1",
+            "status": "unsupported",
+            "reason": "price_not_provided"
+          }
+        ],
+        "contradicted_claims": [],
+        "emotion_progression": 2.4,
+        "catchphrase_repeat": 0.042,
+        "sentence_count": 24,
+        "char_count": 179,
+        "fluency_score": 5,
+        "fluency_reason": "长句数: 0/24 (0%)",
+        "fluency_method": "rule"
+      }
+    }
+  ],
+  "aggregated": {
+    "interactive_sentence_ratio": {
+      "mean": 0.354,
+      "std": 0.11,
+      "min": 0.143,
+      "max": 0.543,
+      "ci95_low": 0.317,
+      "ci95_high": 0.393,
+      "pass_rate": 0.767,
+      "pass_rate_ci95_low": 0.6,
+      "pass_rate_ci95_high": 0.9
+    },
+    "avg_sentence_len": {
+      "mean": 7.18,
+      "std": 0.432,
+      "min": 6.4,
+      "max": 8.1,
+      "ci95_low": 7.03,
+      "ci95_high": 7.337
+    },
+    "spoken_ratio": {
+      "mean": 0.021,
+      "std": 0.012,
+      "min": 0.003,
+      "max": 0.057,
+      "ci95_low": 0.017,
+      "ci95_high": 0.026,
+      "pass_rate": 0.4,
+      "pass_rate_ci95_low": 0.233,
+      "pass_rate_ci95_high": 0.567
+    },
+    "structure_coverage": {
+      "mean": 0.386,
+      "std": 0.154,
+      "min": 0.0,
+      "max": 0.667,
+      "ci95_low": 0.33,
+      "ci95_high": 0.442,
+      "pass_rate": 0.0,
+      "pass_rate_ci95_low": 0.0,
+      "pass_rate_ci95_high": 0.0
+    },
+    "structure_completeness": {
+      "mean": 1.94,
+      "std": 0.756,
+      "min": 0.0,
+      "max": 3.3,
+      "ci95_low": 1.667,
+      "ci95_high": 2.213
+    },
+    "structure_order_score": {
+      "mean": 0.967,
+      "std": 0.18,
+      "min": 0.0,
+      "max": 1.0,
+      "ci95_low": 0.9,
+      "ci95_high": 1.0
+    },
+    "selling_point_coverage": {
+      "mean": 0.756,
+      "std": 0.268,
+      "min": 0.333,
+      "max": 1.0,
+      "ci95_low": 0.65,
+      "ci95_high": 0.845,
+      "pass_rate": 0.5,
+      "pass_rate_ci95_low": 0.3,
+      "pass_rate_ci95_high": 0.667
+    },
+    "hallucination_rate": {
+      "mean": 0.761,
+      "std": 0.321,
+      "min": 0.0,
+      "max": 1.0,
+      "ci95_low": 0.65,
+      "ci95_high": 0.867,
+      "pass_rate": 0.067,
+      "pass_rate_ci95_low": 0.0,
+      "pass_rate_ci95_high": 0.167
+    },
+    "claim_count": {
+      "mean": 1.733,
+      "std": 0.929,
+      "min": 0.0,
+      "max": 4.0,
+      "ci95_low": 1.4,
+      "ci95_high": 2.067
+    },
+    "claim_support_rate": {
+      "mean": 0.172,
+      "std": 0.253,
+      "min": 0.0,
+      "max": 0.667,
+      "ci95_low": 0.083,
+      "ci95_high": 0.261
+    },
+    "unsupported_claim_count": {
+      "mean": 1.267,
+      "std": 0.573,
+      "min": 0.0,
+      "max": 2.0,
+      "ci95_low": 1.067,
+      "ci95_high": 1.467
+    },
+    "contradicted_claim_count": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.0
+    },
+    "emotion_progression": {
+      "mean": 2.517,
+      "std": 0.814,
+      "min": 1.2,
+      "max": 5.0,
+      "ci95_low": 2.227,
+      "ci95_high": 2.807,
+      "pass_rate": 0.1,
+      "pass_rate_ci95_low": 0.0,
+      "pass_rate_ci95_high": 0.2
+    },
+    "catchphrase_repeat": {
+      "mean": 0.031,
+      "std": 0.019,
+      "min": 0.0,
+      "max": 0.05,
+      "ci95_low": 0.023,
+      "ci95_high": 0.037,
+      "pass_rate": 1.0,
+      "pass_rate_ci95_low": 1.0,
+      "pass_rate_ci95_high": 1.0
+    },
+    "sentence_count": {
+      "mean": 24.567,
+      "std": 5.123,
+      "min": 19.0,
+      "max": 46.0,
+      "ci95_low": 22.967,
+      "ci95_high": 26.567
+    },
+    "char_count": {
+      "mean": 176.6,
+      "std": 41.145,
+      "min": 133.0,
+      "max": 366.0,
+      "ci95_low": 164.465,
+      "ci95_high": 192.671
+    },
+    "fluency_score": {
+      "mean": 5.0,
+      "std": 0.0,
+      "min": 5.0,
+      "max": 5.0,
+      "ci95_low": 5.0,
+      "ci95_high": 5.0,
+      "pass_rate": 1.0,
+      "pass_rate_ci95_low": 1.0,
+      "pass_rate_ci95_high": 1.0
+    },
+    "fluency_reason": {
+      "mode": "长句数: 0/24 (0%)",
+      "unique_count": 12
+    },
+    "fluency_method": {
+      "mode": "rule",
+      "unique_count": 1
+    }
+  },
+  "source_report": "/Users/xiaoxiao/work/finetuning/livestream-bot/eval_results/eval_v2_sft-7b_20261125_145245.json",
+  "source_metric_version": "2.0",
+  "source_benchmark_sha256": "35287ade4872dd14f756d2ddadd935de47f92b6dd3e82f349e2bf91323e98da5",
+  "rescore_note": "Re-scored from saved outputs with the current evaluator; no model generation was rerun.",
+  "rescored_at": "2026-11-26T16:40:50.078402",
+  "source_git_commit": "877d8be092f8a7efd70fbe0dabb23439e3f86edb",
+  "source_evaluator_sha256": "f587bd5ffb939bc5730583896f747419251150c79abb1a15597db99fd6156952"
+}
